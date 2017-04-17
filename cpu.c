@@ -72,7 +72,13 @@ err2204_t cpuRun(cpu_t *cpuDevice, ram_t *ramDevice)
                 break;
 
             case CPYT:
-                cpyt(cpuDevice, ramDevice, debugString);
+                result = cpyt(cpuDevice, ramDevice, debugString);
+                if (result != SUCCESS)
+                {
+                    error.errno = result;
+                    error.address = cpuDevice->PC;
+                    return(error);
+                }
                 break;
 
         }
@@ -86,7 +92,7 @@ int cpyf(cpu_t *cpuDevice, char *debugString)
     sprintf(debugString, "Instruction: CPYF");
     debug(debugString, startTime, INFO);
     cpuDevice->sourceAddress = cpuDevice->currentData;
-    return(NULL);
+    return(SUCCESS);
 }
 
 int cpyt(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString)
@@ -94,12 +100,75 @@ int cpyt(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString)
     sprintf(debugString, "Instruction: CPYF");
     debug(debugString, startTime, INFO);
 
-
+    switch (memDirector(cpuDevice->currentData, cpuDevice, ramDevice))
+    {
+        case DEV_INVALID:
+            sprintf(debugString, "Invalid destination address: %x", cpuDevice->currentData);
+            debug(debugString, startTime, ERROR);
+            return (ERR_INVALID_ADDRESS);
+        case DEV_NULL:
+            sprintf(debugString, "Destination address is DEV_NULL");
+            debug(debugString, startTime, WARNING);
+            return (SUCCESS);
+        case DEV_REG:
+            sprintf(debugString, "Destination is register address: %x", cpuDevice->currentData);
+            debug(debugString, startTime, INFO);
+            result = legalCopy(cpuDevice->sourceAddress, cpuDevice->currentData, cpuDevice, ramDevice)
+            if (result != SUCCESS)
+            {
+                sprintf(debugString, "Error copying data: %i", result);
+                debug(debugString, startTime, ERROR);
+                return (result);
+            }
+            /* TODO: Implement data retreival */
+    }
 
     return();
 }
 
-int memDirector(uint64_t address, cpu_t cpuDevice, ram_t ramDevice)
+int legalCopy(uint64_t source, uint64_t destination, cpu_t *cpuDevice, ram_t *ramDevice)
+{
+    int sourceDev = memDirector(source, cpuDevice, ramDevice);
+    int destinationDev = memDirector(destination, cpuDevice, ramDevice);
+    
+    switch (sourceDev)
+    {
+        case DEV_INVALID:
+            return(ERR_READ_FROM_INVALID);
+            break;
+        case DEV_NULL:
+            return(SUCCESS);
+            break;
+        case DEV_REG:
+            return(SUCCESS);
+            break;
+        case DEV_RAM:
+            switch (destinationDev)
+            {
+                case DEV_INVALID:
+                    return(ERR_COPY_TO_INVALID);
+                    break;
+                case DEV_NULL:
+                    return(SUCCESS);
+                    break;
+                case DEV_REG:
+                    return(SUCCESS);
+                    break;
+                case DEV_RAM:
+                    return(ERR_ILLEGAL_MEMORY_COPY);
+                    break;
+                default:
+                    return(ERR_UNEXPECTED_RESULT);
+                    break;
+            }
+            break;
+        default:
+            return(ERR_UNEXPECTED_RESULT);
+            break;
+    }
+}
+
+int memDirector(uint64_t address, cpu_t *cpuDevice, ram_t *ramDevice)
 {
     if (address > 0x00FFFFFF)
     {
