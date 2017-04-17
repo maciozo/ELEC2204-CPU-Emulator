@@ -12,11 +12,22 @@
 
 #define CPU_DEBUG INFO
 
+/* Memory destination devices */
+#define DEV_INVALID -1
+#define DEV_NULL 0
+#define DEV_REG 1
+#define DEV_RAM 2
+
 typedef struct
 {
-    uint64_t ramAddress;
     uint64_t PC;
-    uint64_t registers[64];
+    uint64_t *registers;
+    uint64_t registerMax;
+
+    uint8_t currentInstruction;
+    uint64_t currentWord;
+    uint64_t currentData;
+    uint64_t sourceAddress;
 } cpu_t;
 
 void cpuInit(uint64_t ramAddress);

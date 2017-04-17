@@ -10,13 +10,16 @@
 
 int main(int argc, char* argv[])
 {
-    bus_t systemBus;
+    cpu_t cpuDevice;
+    ram_t ramDevice;
 
     const char *bootloaderFilename;
     FILE *bootloader;
 
-    const uint8_t ramAddress;
+    const uint64_t ramAddress;
     const uint64_t ramSize;
+    
+    uint64_t registerCount;
 
     config_t config;
     config_init(&config);
@@ -35,7 +38,6 @@ int main(int argc, char* argv[])
     {
         printf("Loading: %s\n", bootloaderFilename);
         bootloader = fopen(bootloaderFilename, "rb");
-        fclose(bootloader);
     }
     else
     {
@@ -48,12 +50,39 @@ int main(int argc, char* argv[])
         perror("Unable to open bootloader file for reading\n");
         return(1);
     }
+    fclose(bootloader);
 
     getRamInfo(&config, &ramAddress, &ramSize);
+    
+    registerCount = getRegisterCount(&config);
+    if (registerCount)
+    {
+        return(1);
+    }
 
-    ramInit(&systemBus, &ramAddress, &ramSize);
-    cpuInit(&systemBus);
+    ramInit(&ramDevice, ramAddress, ramSize);
+    cpuInit(&cpuDevice, ramAddress, registerCount);
     return(0);
+}
+
+uint64_t getRegisterCount(config_t *config)
+{
+    uint64_t registerCount;
+    
+    /* Making sure that the registerCount has been defined in the config */
+    if(!config_lookup_int64(&config, "registerCount", &registerCount))
+    {
+        fprintf(stderr, "No registerCount defined.\n");
+        return(0);
+    }
+    
+    if (registerCount < 1)
+    {
+        fprintf(stderr, "At least one CPU register is required.\n");
+        return(0);
+    }
+
+    return(registerCount);
 }
 
 int getRamInfo(config_t *config, uint64_t *ramAddress, uint64_t *ramSize)
@@ -71,7 +100,7 @@ int getRamInfo(config_t *config, uint64_t *ramAddress, uint64_t *ramSize)
     /* Getting the device address of the RAM */
     if(config_lookup_int64(&config, "ram.address", &addr))
     {
-        if ((addr == 0) | (addr > 0xFF))
+        if ((addr == 0) | (addr > 0x00FFFFFF))
         {
             fprintf(stderr, "Invalid RAM device address.\n");
             return(1);
