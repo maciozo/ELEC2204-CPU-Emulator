@@ -4,7 +4,7 @@
 
 #include "ram.h"
 
-void ramInit(uint8_t ramAddress, uint64_t ramSize, FILE *bootloader, ram_t *ramDevice)
+void ramInit(uint8_t ramAddress, uint64_t ramSize, ram_t *ramDevice)
 {
     ramDevice->address = ramAddress;
     ramDevice->size = ramSize;
@@ -110,6 +110,12 @@ int ramWriteBurst(ram_t *ramDevice, uint64_t ramAddress, uint64_t *writeFrom, ui
         {
             return(ERR_RAM_ADDRESS_IN_USE);
         }
+    }
+    
+    /* Mark writted addresses as in use */
+    for (i = 0; i < length; i++)
+    {
+        ramDevice->states[address - ramDevice->address + i] = RAM_USED;
     }
 
     memcpy(&(ramDevice->ram[address - ramDevice->address]), writeFrom, length);

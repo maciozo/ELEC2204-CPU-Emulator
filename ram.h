@@ -31,13 +31,12 @@ typedef struct
 ====Initialise RAM device=======================================================
     ramAddress:     First memory address of the RAM.
     ramSize:        Size of the RAM device in blocks of 64 bits.
-    *bootloader:    Pointer to the bootloader file.
     *ramDevice:     Pointer to the desired ram_t instance.
 ====================
     Returns NULL
 ================================================================================
 */
-void ramInit(uint8_t ramAddress, uint64_t ramSize, FILE *bootloader, ram_t *ramDevice);
+void ramInit(uint8_t ramAddress, uint64_t ramSize, ram_t *ramDevice);
 
 /*
 ====Read single word from RAM===================================================
