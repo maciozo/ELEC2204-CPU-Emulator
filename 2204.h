@@ -21,4 +21,12 @@
 */
 #define CPYF 0x01
 
+/* 
+----Copy data from one address to another---------------------------------------
+    Layout      8   Instruction
+                54  Destination address
+--------------------------------------------------------------------------------
+*/
+#define CPYT 0x02
+
 #endif
