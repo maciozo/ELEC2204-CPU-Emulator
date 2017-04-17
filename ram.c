@@ -3,15 +3,28 @@
 #include <string.h>
 
 #include "ram.h"
+#include "errors.h"
 
-void ramInit(uint8_t ramAddress, uint64_t ramSize, ram_t *ramDevice)
+int ramInit(uint8_t ramAddress, uint64_t ramSize, ram_t *ramDevice)
 {
     ramDevice->address = ramAddress;
+    if (ramDevice->address < 2)
+    {
+        return(ERR_ADDRESS_OUT_OF_RANGE);
+    }
+    
     ramDevice->size = ramSize;
+    ramDevice->addressMax = ramAddress + size - 1;
+    if (ramDevice->addressMax > 0x00FFFFFF)
+    {
+        return(ERR_END_ADDRESS_OUT_OF_RANGE);
+    }
+    
     ramDevice->ram = (uint64_t*) malloc(sizeof(uint64_t) * ramSize);
     ramDevice->states = (uint8_t*) malloc(sizeof(uint8_t) * ramSize);
-    ramDevice->addressMax = ramAddress + size - 1;
-    return(NULL);
+    
+    
+    return(SUCCESS);
 }
 
 int ramRead(ram_t *ramDevice, uint64_t address, uint64_t *readTo)
