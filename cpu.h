@@ -12,4 +12,4 @@ typedef struct
 } cpu_t;
 
 void cpuInit(bus_t* systemBus, FILE* bootloader, uint8_t ramAddress);
-void *cpuRun(void *cpuInfo);
+void cpuRun(cpu_t *cpuInfo);
