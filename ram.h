@@ -33,10 +33,12 @@ typedef struct
     ramSize:        Size of the RAM device in blocks of 64 bits.
     *ramDevice:     Pointer to the desired ram_t instance.
 ====================
-    Returns NULL
+    Returns         ERR_ADDRESS_OUT_OF_RANGE
+                    ERR_END_ADDRESS_OUT_OF_RANGE
+                    SUCCESS
 ================================================================================
 */
-void ramInit(uint64_t ramAddress, uint64_t ramSize, ram_t *ramDevice);
+int ramInit(ram_t *ramDevice, uint8_t ramAddress, uint64_t ramSize);
 
 /*
 ====Read single word from RAM===================================================

@@ -5,7 +5,7 @@
 #include "ram.h"
 #include "errors.h"
 
-int ramInit(uint8_t ramAddress, uint64_t ramSize, ram_t *ramDevice)
+int ramInit(ram_t *ramDevice, uint8_t ramAddress, uint64_t ramSize)
 {
     ramDevice->address = ramAddress;
     if (ramDevice->address < 2)
@@ -22,7 +22,6 @@ int ramInit(uint8_t ramAddress, uint64_t ramSize, ram_t *ramDevice)
     
     ramDevice->ram = (uint64_t*) malloc(sizeof(uint64_t) * ramSize);
     ramDevice->states = (uint8_t*) malloc(sizeof(uint8_t) * ramSize);
-    
     
     return(SUCCESS);
 }
