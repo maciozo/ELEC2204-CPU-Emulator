@@ -6,6 +6,7 @@
 #include "main.h"
 #include "cpu.h"
 #include "ram.h"
+#include "errors.h"
 
 int main(int argc, char* argv[])
 {

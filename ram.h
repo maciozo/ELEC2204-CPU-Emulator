@@ -12,7 +12,7 @@
 typedef struct
 {
     /* First memory address */
-    uint8_t address;
+    uint64_t address;
 
     /* Size of the RAM. ramSize*64 bits */
     uint64_t size;
@@ -36,7 +36,7 @@ typedef struct
     Returns NULL
 ================================================================================
 */
-void ramInit(uint8_t ramAddress, uint64_t ramSize, ram_t *ramDevice);
+void ramInit(uint64_t ramAddress, uint64_t ramSize, ram_t *ramDevice);
 
 /*
 ====Read single word from RAM===================================================
