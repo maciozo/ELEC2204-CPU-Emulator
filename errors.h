@@ -9,7 +9,7 @@
 /* The target address is outside of the boundaries of the device's memory addresses */
 #define ERR_ADDRESS_OUT_OF_RANGE -1
 
-/* 
+/*
     The end address is outside of the boundaries of the device's memory addresses.
     Length is probably too long.
 */
@@ -21,7 +21,7 @@
 /* The specified address is invalid. Most likely no device owns that address */
 #define ERR_INVALID_ADDRESS -4
 
-/* 
+/*
     Cannot copy from the specified source address to the specified destination address.
     Most likely because the program attempted to copy data without going through the CPU registers.
 */
@@ -32,6 +32,9 @@
 
 /* The program tried to read data from an invalid address */
 #define ERR_READ_FROM_INVALID -7
+
+/* The program received an unexpected result from a function */
+#define ERR_UNEXPECTED_RESULT -8
 
 
 typedef struct
