@@ -5,6 +5,7 @@
 #include <stdio.h>
 
 #include "ram.h"
+#include "errors.h"
 
 #define ERROR 0
 #define WARNING 1
@@ -30,8 +31,13 @@ typedef struct
     uint64_t sourceAddress;
 } cpu_t;
 
-void cpuInit(uint64_t ramAddress);
-void cpuRun(cpu_t *cpuDevice, ram_t *ramDevice);
-void debug(char *string)
+void cpuInit(cpu_t *cpuDevice, uint64_t bootAddress, uint64_t registerCount);
+err2204_t cpuRun(cpu_t *cpuDevice, ram_t *ramDevice);
+int legalCopy(uint64_t source, uint64_t destination, cpu_t *cpuDevice, ram_t *ramDevice);
+int memDirector(uint64_t address, cpu_t *cpuDevice, ram_t *ramDevice);
+void debug(char *string, time_t startTime, int level);
+
+int cpyf(cpu_t *cpuDevice, char *debugString);
+int cpyt(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
 
 #endif
