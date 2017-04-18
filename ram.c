@@ -15,7 +15,7 @@ int ramInit(ram_t *ramDevice, uint8_t ramAddress, uint64_t ramSize)
     
     ramDevice->size = ramSize;
     ramDevice->addressMax = ramAddress + size - 1;
-    if (ramDevice->addressMax > 0x00FFFFFF)
+    if (ramDevice->addressMax > 0x00FFFFFFFFFFFFFF)
     {
         return(ERR_END_ADDRESS_OUT_OF_RANGE);
     }

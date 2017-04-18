@@ -54,7 +54,7 @@ err2204_t cpuRun(cpu_t *cpuDevice, ram_t *ramDevice)
         debug(debugString, startTime, INFO);
 
         /* Get the bottom 56 bits. These contain the payload. */
-        cpuDevice->currentData = cpuDevice->currentWord & 0x00FFFFFF;
+        cpuDevice->currentData = cpuDevice->currentWord & 0x00FFFFFFFFFFFFFF;
         sprintf(debugString, "Payload: %x", cpuDevice->currentData);
         debug(debugString, startTime, INFO);
 
@@ -100,16 +100,21 @@ int cpyt(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString)
     sprintf(debugString, "Instruction: CPYF");
     debug(debugString, startTime, INFO);
 
+    /* Determine destination device */
     switch (memDirector(cpuDevice->currentData, cpuDevice, ramDevice))
     {
         case DEV_INVALID:
             sprintf(debugString, "Invalid destination address: %x", cpuDevice->currentData);
             debug(debugString, startTime, ERROR);
             return (ERR_INVALID_ADDRESS);
+            break;
+            
         case DEV_NULL:
             sprintf(debugString, "Destination address is DEV_NULL");
             debug(debugString, startTime, WARNING);
             return (SUCCESS);
+            break;
+            
         case DEV_REG:
             sprintf(debugString, "Destination is register address: %x", cpuDevice->currentData);
             debug(debugString, startTime, INFO);
@@ -120,7 +125,46 @@ int cpyt(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString)
                 debug(debugString, startTime, ERROR);
                 return (result);
             }
-            /* TODO: Implement data retreival */
+
+            /* Determine source device */
+            switch (memDirector(cpuDevice->sourceAddress, cpuDevice, ramDevice))
+            {
+                case DEV_REG:
+                    cpuDevice->registers[cpuDevice->currentData] = cpuDevice->registers[cpuDevice->sourceAddress];
+                    break;
+                case DEV_RAM:
+                    result = ramRead(ramDevice, cpuDevice->sourceAddress, &(cpuDevice->registers[cpuDevice->currentData]));
+                    if (result != SUCCESS)
+                    {
+                        sprintf(debugString, "Error reading from RAM: %i", result);
+                        debug(debugString, startTime, ERROR);
+                        return (result);
+                    }
+                    break;
+            }
+            return (SUCCESS);
+            break;
+        
+        case DEV_RAM:
+            sprintf(debugString, "Destination is RAM address: %x", cpuDevice->currentData);
+            debug(debugString, startTime, INFO);
+            result = legalCopy(cpuDevice->sourceAddress, cpuDevice->currentData, cpuDevice, ramDevice)
+            if (result != SUCCESS)
+            {
+                sprintf(debugString, "Error copying data: %i", result);
+                debug(debugString, startTime, ERROR);
+                return (result);
+            }
+            
+            result = ramWrite(ramDevice, cpuDevice->currentData, cpuDevice->registers[cpuDevice->sourceAddress]);
+            if (result != SUCCESS)
+            {
+                sprintf(debugString, "Error writing to RAM: %i", result);
+                debug(debugString, startTime, ERROR);
+                return (result);
+            }
+            return (SUCCESS);
+            break;
     }
 
     return();
@@ -170,7 +214,7 @@ int legalCopy(uint64_t source, uint64_t destination, cpu_t *cpuDevice, ram_t *ra
 
 int memDirector(uint64_t address, cpu_t *cpuDevice, ram_t *ramDevice)
 {
-    if (address > 0x00FFFFFF)
+    if (address > 0x00FFFFFFFFFFFFFF)
     {
         return(DEV_INVALID);
     }

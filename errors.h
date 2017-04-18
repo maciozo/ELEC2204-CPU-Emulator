@@ -36,6 +36,9 @@
 /* The program received an unexpected result from a function */
 #define ERR_UNEXPECTED_RESULT -8
 
+/* The specified instruction has not been defined */
+#define ERR_UNKNOWN_INSTRUCTION -9
+
 
 typedef struct
 {

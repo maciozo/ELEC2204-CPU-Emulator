@@ -39,7 +39,11 @@ void printError(err2204_t *error)
             break;
 
         case ERR_UNEXPECTED_RESULT:
-            fprintf(stderr, "Instruction at %x. TThe program received an unexpected result from a function. (ERR_UNEXPECTED_RESULT)\n", error->address);
+            fprintf(stderr, "Instruction at %x. The program received an unexpected result from a function. (ERR_UNEXPECTED_RESULT)\n", error->address);
+            break;
+            
+        case ERR_UNKNOWN_INSTRUCTION:
+            fprintf(stderr, "Instruction at %x. The program received an undefined instruction. (ERR_UNKNOWN_INSTRUCTION)\n", error->address);
             break;
 
         default:
