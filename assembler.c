@@ -88,13 +88,17 @@ int assemble(char *inputLine, FILE *outputFile, uint64_t lineNumber)
             {
                 i++;
             }
+            else
+            {
+                break;
+            }
         }
         strncpy(arg, inputLine + col, i);
         word = strtoull(arg, NULL, 16);
         fwrite(&word, sizeof(uint64_t), 1, outputFile);
         
         /* Getting the position of the second address in the asm file */
-        for (col = 5 + i; col < lineLength; col++)
+        for (col = 5 + i + 1; col < lineLength; col++)
         {
             if (inputLine[col] != ' ')
             {
@@ -104,7 +108,7 @@ int assemble(char *inputLine, FILE *outputFile, uint64_t lineNumber)
         
         /* Getting the length of the second address in the asm file */
         i = 0;
-        for (col; col < lineLength; col++)
+        for (; col < lineLength; col++)
         {
             if ((inputLine[col] == ' ') || (inputLine[col] == ';') || (inputLine[col] == '\n') || (inputLine[col] == '\r'))
             {
