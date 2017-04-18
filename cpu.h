@@ -25,10 +25,8 @@ typedef struct
     uint64_t *registers;
     uint64_t registerMax;
 
-    uint8_t currentInstruction;
-    uint64_t currentWord;
-    uint64_t currentData;
-    uint64_t sourceAddress;
+    uint64_t currentInstruction;
+    uint64_t arguments[4];
 } cpu_t;
 
 void cpuInit(cpu_t *cpuDevice, uint64_t bootAddress, uint64_t registerCount);

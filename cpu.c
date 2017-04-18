@@ -4,6 +4,7 @@
 
 #include "cpu.h"
 #include "errors.h"
+#include "./2204/2204.h"
 
 #ifdef DEBUG
     #include <time.h>
@@ -23,6 +24,8 @@ err2204_t cpuRun(cpu_t *cpuDevice, ram_t *ramDevice)
     err2204_t error;
     char debugString[128];
     int result;
+    int sourceDevice;
+    int destinationDevice;
 
     #ifdef DEBUG
         time_t startTime = time(NULL);
@@ -36,7 +39,7 @@ err2204_t cpuRun(cpu_t *cpuDevice, ram_t *ramDevice)
         /* Reading instruction at the address specified by PC */
         sprintf(debugString, "Reading instruction at %x", cpuDevice->PC);
         debug(debugString, startTime, INFO);
-        result = ramRead(ramDevice, cpuDevice->PC, &cpuDevice->currentWord);
+        result = ramRead(ramDevice, cpuDevice->PC, &cpuDevice->currentInstruction);
 
         /* Did we fail to read the instruction? */
         if (result != SUCCESS)
@@ -47,15 +50,8 @@ err2204_t cpuRun(cpu_t *cpuDevice, ram_t *ramDevice)
             error.address = cpuDevice->PC;
             return(error);
         }
-
-        /* Get the top 8 bits of the data. These contain the instruction */
-        cpuDevice->currentInstruction = (cpuDevice->currentWord >> 56) & 0xFF;
+        
         sprintf(debugString, "Instruction: %x", cpuDevice->currentInstruction);
-        debug(debugString, startTime, INFO);
-
-        /* Get the bottom 56 bits. These contain the payload. */
-        cpuDevice->currentData = cpuDevice->currentWord & 0x00FFFFFFFFFFFFFF;
-        sprintf(debugString, "Payload: %x", cpuDevice->currentData);
         debug(debugString, startTime, INFO);
 
         /* Decode instruction */
@@ -65,156 +61,48 @@ err2204_t cpuRun(cpu_t *cpuDevice, ram_t *ramDevice)
                 sprintf(debugString, "Instruction: NOOP");
                 debug(debugString, startTime, INFO);
                 result = SUCCESS;
+                cpuDevice->PC++;
                 break;
 
-            case CPYF:
-                result = cpyf(cpuDevice, debugString);
-                break;
-
-            case CPYT:
-                result = cpyt(cpuDevice, ramDevice, debugString);
-                if (result != SUCCESS)
+            case COPY:
+                sprintf(debugString, "Instruction: COPY");
+                debug(debugString, startTime, INFO);
+                error = copy2204(cpuDevice, ramDevice, debugString);
+                if (error.errno != SUCCESS)
                 {
-                    error.errno = result;
-                    error.address = cpuDevice->PC;
-                    return(error);
+                    return (error);
                 }
                 break;
-
+                
+            default:
+                error.errno = ERR_UNKNOWN_INSTRUCTION;
+                error.address = cpuDevice->PC;
+                return(error);
+                break;
         }
 
     }
     return(NULL);
 }
 
-int cpyf(cpu_t *cpuDevice, char *debugString)
+err2204_t checkResult(int result, uint64_t address, char *debugString, const char *errorText, time_t startTime)
 {
-    sprintf(debugString, "Instruction: CPYF");
-    debug(debugString, startTime, INFO);
-    cpuDevice->sourceAddress = cpuDevice->currentData;
-    return(SUCCESS);
-}
-
-int cpyt(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString)
-{
-    sprintf(debugString, "Instruction: CPYF");
-    debug(debugString, startTime, INFO);
-
-    /* Determine destination device */
-    switch (memDirector(cpuDevice->currentData, cpuDevice, ramDevice))
+    err2204_t error;
+    error.errno = result;
+    error.address = address;
+    if (result != SUCCESS)
     {
-        case DEV_INVALID:
-            sprintf(debugString, "Invalid destination address: %x", cpuDevice->currentData);
+        #ifdef DEBUG
+            sprintf(debugString, "%s (Error %i)", errorText, result);
             debug(debugString, startTime, ERROR);
-            return (ERR_INVALID_ADDRESS);
-            break;
-            
-        case DEV_NULL:
-            sprintf(debugString, "Destination address is DEV_NULL");
-            debug(debugString, startTime, WARNING);
-            return (SUCCESS);
-            break;
-            
-        case DEV_REG:
-            sprintf(debugString, "Destination is register address: %x", cpuDevice->currentData);
-            debug(debugString, startTime, INFO);
-            result = legalCopy(cpuDevice->sourceAddress, cpuDevice->currentData, cpuDevice, ramDevice)
-            if (result != SUCCESS)
-            {
-                sprintf(debugString, "Error copying data: %i", result);
-                debug(debugString, startTime, ERROR);
-                return (result);
-            }
-
-            /* Determine source device */
-            switch (memDirector(cpuDevice->sourceAddress, cpuDevice, ramDevice))
-            {
-                case DEV_REG:
-                    cpuDevice->registers[cpuDevice->currentData] = cpuDevice->registers[cpuDevice->sourceAddress];
-                    break;
-                case DEV_RAM:
-                    result = ramRead(ramDevice, cpuDevice->sourceAddress, &(cpuDevice->registers[cpuDevice->currentData]));
-                    if (result != SUCCESS)
-                    {
-                        sprintf(debugString, "Error reading from RAM: %i", result);
-                        debug(debugString, startTime, ERROR);
-                        return (result);
-                    }
-                    break;
-            }
-            return (SUCCESS);
-            break;
-        
-        case DEV_RAM:
-            sprintf(debugString, "Destination is RAM address: %x", cpuDevice->currentData);
-            debug(debugString, startTime, INFO);
-            result = legalCopy(cpuDevice->sourceAddress, cpuDevice->currentData, cpuDevice, ramDevice)
-            if (result != SUCCESS)
-            {
-                sprintf(debugString, "Error copying data: %i", result);
-                debug(debugString, startTime, ERROR);
-                return (result);
-            }
-            
-            result = ramWrite(ramDevice, cpuDevice->currentData, cpuDevice->registers[cpuDevice->sourceAddress]);
-            if (result != SUCCESS)
-            {
-                sprintf(debugString, "Error writing to RAM: %i", result);
-                debug(debugString, startTime, ERROR);
-                return (result);
-            }
-            return (SUCCESS);
-            break;
+        #endif
     }
-
-    return();
-}
-
-int legalCopy(uint64_t source, uint64_t destination, cpu_t *cpuDevice, ram_t *ramDevice)
-{
-    int sourceDev = memDirector(source, cpuDevice, ramDevice);
-    int destinationDev = memDirector(destination, cpuDevice, ramDevice);
-    
-    switch (sourceDev)
-    {
-        case DEV_INVALID:
-            return(ERR_READ_FROM_INVALID);
-            break;
-        case DEV_NULL:
-            return(SUCCESS);
-            break;
-        case DEV_REG:
-            return(SUCCESS);
-            break;
-        case DEV_RAM:
-            switch (destinationDev)
-            {
-                case DEV_INVALID:
-                    return(ERR_COPY_TO_INVALID);
-                    break;
-                case DEV_NULL:
-                    return(SUCCESS);
-                    break;
-                case DEV_REG:
-                    return(SUCCESS);
-                    break;
-                case DEV_RAM:
-                    return(ERR_ILLEGAL_MEMORY_COPY);
-                    break;
-                default:
-                    return(ERR_UNEXPECTED_RESULT);
-                    break;
-            }
-            break;
-        default:
-            return(ERR_UNEXPECTED_RESULT);
-            break;
-    }
+    return (error)
 }
 
 int memDirector(uint64_t address, cpu_t *cpuDevice, ram_t *ramDevice)
 {
-    if (address > 0x00FFFFFFFFFFFFFF)
+    if (address > 0xFFFFFFFFFFFFFFFF)
     {
         return(DEV_INVALID);
     }
