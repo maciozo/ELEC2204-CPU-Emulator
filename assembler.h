@@ -7,4 +7,6 @@
 int main(int argc, char* argv[]);
 int assemble(char *inputLine, FILE *outputFile, uint64_t lineNumber);
 
+int twoArgs(char *inputLine, FILE *outputFile);
+
 #endif
