@@ -42,8 +42,10 @@
 
 typedef struct
 {
-    int errno;
+    int errnum;
     uint64_t address;
 } err2204_t;
+
+void printError(err2204_t *error);
 
 #endif

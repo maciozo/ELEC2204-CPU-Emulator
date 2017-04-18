@@ -4,7 +4,7 @@
 
 void printError(err2204_t *error)
 {
-    switch(error->errno)
+    switch(error->errnum)
     {
         case SUCCESS:
             fprintf(stderr, "Instruction at %x. The operation completed successfully. (SUCCESS)\n", error->address);
@@ -47,7 +47,7 @@ void printError(err2204_t *error)
             break;
 
         default:
-            fprintf(stderr, "Instruction at %x. Unknown error (%i%).\n", error->address, error->errno);
+            fprintf(stderr, "Instruction at %x. Unknown error (%i%).\n", error->address, error->errnum);
             break;
     }
 }

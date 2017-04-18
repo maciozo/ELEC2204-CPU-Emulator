@@ -24,18 +24,14 @@ typedef struct
     uint64_t PC;
     uint64_t *registers;
     uint64_t registerMax;
-
     uint64_t currentInstruction;
     uint64_t arguments[4];
 } cpu_t;
 
 void cpuInit(cpu_t *cpuDevice, uint64_t bootAddress, uint64_t registerCount);
 err2204_t cpuRun(cpu_t *cpuDevice, ram_t *ramDevice);
-int legalCopy(uint64_t source, uint64_t destination, cpu_t *cpuDevice, ram_t *ramDevice);
 int memDirector(uint64_t address, cpu_t *cpuDevice, ram_t *ramDevice);
 void debug(char *string, time_t startTime, int level);
-
-int cpyf(cpu_t *cpuDevice, char *debugString);
-int cpyt(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
+err2204_t checkResult(int result, uint64_t address, char *debugString, const char *errorText, time_t startTime);
 
 #endif

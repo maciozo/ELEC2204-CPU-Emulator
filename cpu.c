@@ -46,7 +46,7 @@ err2204_t cpuRun(cpu_t *cpuDevice, ram_t *ramDevice)
         {
             sprintf(debugString, "Failed. Error %i", result);
             debug(debugString, startTime, ERROR);
-            error.errno = result;
+            error.errnum = result;
             error.address = cpuDevice->PC;
             return(error);
         }
@@ -68,14 +68,14 @@ err2204_t cpuRun(cpu_t *cpuDevice, ram_t *ramDevice)
                 sprintf(debugString, "Instruction: COPY");
                 debug(debugString, startTime, INFO);
                 error = copy2204(cpuDevice, ramDevice, debugString);
-                if (error.errno != SUCCESS)
+                if (error.errnum != SUCCESS)
                 {
                     return (error);
                 }
                 break;
                 
             default:
-                error.errno = ERR_UNKNOWN_INSTRUCTION;
+                error.errnum = ERR_UNKNOWN_INSTRUCTION;
                 error.address = cpuDevice->PC;
                 return(error);
                 break;
@@ -88,7 +88,7 @@ err2204_t cpuRun(cpu_t *cpuDevice, ram_t *ramDevice)
 err2204_t checkResult(int result, uint64_t address, char *debugString, const char *errorText, time_t startTime)
 {
     err2204_t error;
-    error.errno = result;
+    error.errnum = result;
     error.address = address;
     if (result != SUCCESS)
     {

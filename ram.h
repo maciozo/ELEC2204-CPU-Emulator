@@ -105,7 +105,7 @@ int ramWriteBurst(ram_t *ramDevice, uint64_t ramAddress, uint64_t *writeFrom, ui
                     SUCCESS
 ================================================================================
 */
-int ramFree(ram_t *ramDevice, uint64_t address, uint64_t length)
+int ramFree(ram_t *ramDevice, uint64_t address, uint64_t length);
 
 /*
 ====Get the state of a range of RAM addresses===================================
