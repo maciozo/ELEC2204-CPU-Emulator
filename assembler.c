@@ -81,7 +81,14 @@ int assemble(char *inputLine, FILE *outputFile, uint64_t lineNumber)
     {
         word = NOOP;
         printf("%s -> %" PRIx64 "\n", instruction, word);
-        word = htobe64(word);
+        fwrite(&word, sizeof(uint64_t), 1, outputFile);
+        return (SUCCESS);
+    }
+    
+    else if (!strcmp(instruction, "STOP"))
+    {
+        word = STOP;
+        printf("%s -> %" PRIx64 "\n", instruction, word);
         fwrite(&word, sizeof(uint64_t), 1, outputFile);
         return (SUCCESS);
     }
@@ -90,15 +97,52 @@ int assemble(char *inputLine, FILE *outputFile, uint64_t lineNumber)
     {
         word = COPY;
         printf("%s -> %" PRIx64 "\n", instruction, word);
-        word = htobe64(word);
         fwrite(&word, sizeof(uint64_t), 1, outputFile);
         return (twoArgs(inputLine, outputFile));
+    }
+    
+    else if (!strcmp(instruction, "PRNT"))
+    {
+        word = PRNT;
+        printf("%s -> %" PRIx64 "\n", instruction, word);
+        fwrite(&word, sizeof(uint64_t), 1, outputFile);
+        return (oneArg(inputLine, outputFile));
     }
     
     else
     {
         return (ERR_UNKNOWN_INSTRUCTION);
     }
+}
+
+int oneArg(char *inputLine, FILE *outputFile)
+{
+    char arg[19];
+    int lineLength;
+    int col;
+    int i;
+    uint64_t word;
+    
+    lineLength = strlen(inputLine);
+    
+    /* Getting the length of the first address in the asm file */
+    i = 0;
+    for (col = 5; col < lineLength; col++)
+    {
+        if ((inputLine[col] != ',') || (inputLine[col] != ' ') || (inputLine[col] != ';') || (inputLine[col] != '\n') || (inputLine[col] != '\r'))
+        {
+            i++;
+        }
+        else
+        {
+            break;
+        }
+    }
+    strncpy(arg, inputLine +  5, i - 1);
+    word = strtoull(arg, NULL, 0);
+    printf("%s -> %" PRIx64 "\n", arg, word);
+    fwrite(&word, sizeof(uint64_t), 1, outputFile);
+    return (SUCCESS);
 }
 
 int twoArgs(char *inputLine, FILE *outputFile)
@@ -126,9 +170,8 @@ int twoArgs(char *inputLine, FILE *outputFile)
         }
     }
     strncpy(arg, inputLine +  5, i);
-    word = strtoull(arg, NULL, 16);
+    word = strtoull(arg, NULL, 0);
     printf("%s -> %" PRIx64 "\n", arg, word);
-    word = htobe64(word);
     fwrite(&word, sizeof(uint64_t), 1, outputFile);
     
     /* Getting the position of the second address in the asm file */
@@ -152,9 +195,8 @@ int twoArgs(char *inputLine, FILE *outputFile)
         i++;
     }
     strncpy(arg, inputLine + startCol, i);
-    word = strtoull(arg, NULL, 16);
+    word = strtoull(arg, NULL, 0);
     printf("%s -> %" PRIx64 "\n", arg, word);
-    word = htobe64(word);
     fwrite(&word, sizeof(uint64_t), 1, outputFile);
     
     return (SUCCESS);

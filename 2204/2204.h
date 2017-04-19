@@ -12,7 +12,6 @@
 /* 
 ----No operation----------------------------------------------------------------
     ASM Layout  NOOP
-                NOOP <ignored>
     Bin Layout  0x0000000000000000
 --------------------------------------------------------------------------------
 */
@@ -20,8 +19,7 @@
 
 /* 
 ----Copy data from one address to another---------------------------------------
-    ASM Layout  COPY 0x???????????????? 0x????????????????
-                COPY <64bit source address> <64bit destination address>
+    ASM Layout  COPY <64bit source address>, <64bit destination address>
     Bin Layout  0x0000000000000001
                 0x????????????????
                 0x????????????????
@@ -30,5 +28,23 @@
 #define COPY 0x0000000000000001
 err2204_t copy2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString, time_t *startTime);
 int legalCopy(int sourceDev, int destinationDev);
+
+/* 
+----Stop the CPU----------------------------------------------------------------
+    ASM Layout  STOP
+    Bin Layout  0x0000000000000002
+--------------------------------------------------------------------------------
+*/
+#define STOP 0x0000000000000002
+
+/* 
+----Print the value of the specified address------------------------------------
+    ASM Layout  PRNT <64bit address>
+    Bin Layout  0x0000000000000003
+                0x????????????????
+--------------------------------------------------------------------------------
+*/
+#define PRNT 0x0000000000000003
+err2204_t prnt2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString, time_t *startTime);
 
 #endif
