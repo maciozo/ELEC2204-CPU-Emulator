@@ -1,9 +1,11 @@
+#include <time.h>
+
 #include "2204.h"
 #include "../errors.h"
 #include "../cpu.h"
 #include "../ram.h"
 
-err2204_t copy2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString)
+err2204_t copy2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString, time_t *startTime)
 {
     int result;
     int sourceDevice;
@@ -13,7 +15,7 @@ err2204_t copy2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString)
     /* Get source address */
     cpuDevice->PC++;
     result = ramRead(ramDevice, cpuDevice->PC, &cpuDevice->arguments[0]);
-    error = checkResult(result, cpuDevice->PC, debugString, "Failed to read from RAM.", startTime);
+    error = checkResult(result, cpuDevice->PC, debugString, "Failed to read from RAM.", *startTime);
     if (result != SUCCESS)
     {
         return (error);
@@ -23,7 +25,7 @@ err2204_t copy2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString)
     /* Get destination address */
     cpuDevice->PC++;
     result = ramRead(ramDevice, cpuDevice->PC, &cpuDevice->arguments[1]);
-    error = checkResult(result, cpuDevice->PC, debugString, "Failed to read from RAM.", startTime);
+    error = checkResult(result, cpuDevice->PC, debugString, "Failed to read from RAM.", *startTime);
     if (result != SUCCESS)
     {
         return (error);
@@ -31,8 +33,8 @@ err2204_t copy2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString)
     destinationDevice = memDirector(cpuDevice->arguments[1], cpuDevice, ramDevice);
     
     /* Check to make sure the copy is legal. i.e. (Device -> Register) or (Register -> Device) */
-    result = legalCopy(sourceDevice, deistinationDevice);
-    error = checkResult(result, cpuDevice->PC, debugString, "Illegal copy operation.", startTime);
+    result = legalCopy(sourceDevice, destinationDevice);
+    error = checkResult(result, cpuDevice->PC, debugString, "Illegal copy operation.", *startTime);
     if (result != SUCCESS)
     {
         return (error);
@@ -50,7 +52,7 @@ err2204_t copy2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString)
                     break;
                 case DEV_RAM:
                     result = ramWrite(ramDevice, cpuDevice->arguments[1], 0x0000000000000000);
-                    error = checkResult(result, cpuDevice->PC, debugString, "Failed to write to RAM.", startTime);
+                    error = checkResult(result, cpuDevice->PC, debugString, "Failed to write to RAM.", *startTime);
                     if (result != SUCCESS)
                     {
                         return (error);
@@ -58,7 +60,7 @@ err2204_t copy2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString)
                     break;
                 default:
                     result = ERR_UNEXPECTED_RESULT;
-                    error = checkResult(result, cpuDevice->PC, debugString, "Unexpected destination device.", startTime);
+                    error = checkResult(result, cpuDevice->PC, debugString, "Unexpected destination device.", *startTime);
                     if (result != SUCCESS)
                     {
                         return (error);
@@ -76,14 +78,14 @@ err2204_t copy2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString)
                     break;
                 case DEV_RAM:
                     result = ramWrite(ramDevice, cpuDevice->arguments[1], cpuDevice->registers[cpuDevice->arguments[0]]);
-                    error = checkResult(result, cpuDevice->PC, debugString, "Failed to write to RAM.", startTime);
+                    error = checkResult(result, cpuDevice->PC, debugString, "Failed to write to RAM.", *startTime);
                     if (result != SUCCESS)
                     {
                         return (error);
                     }
                 default:
                     result = ERR_UNEXPECTED_RESULT;
-                    error = checkResult(result, cpuDevice->PC, debugString, "Unexpected destination device.", startTime);
+                    error = checkResult(result, cpuDevice->PC, debugString, "Unexpected destination device.", *startTime);
                     return (error);
                     break;
             }
@@ -95,7 +97,7 @@ err2204_t copy2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString)
                     break;
                 case DEV_REG:
                     result = ramRead(ramDevice, cpuDevice->arguments[0], &(cpuDevice->registers[cpuDevice->arguments[1]]));
-                    error = checkResult(result, cpuDevice->PC, debugString, "Failed to read from RAM.", startTime);
+                    error = checkResult(result, cpuDevice->PC, debugString, "Failed to read from RAM.", *startTime);
                     if (result != SUCCESS)
                     {
                         return (error);
@@ -103,14 +105,14 @@ err2204_t copy2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString)
                     break;
                 default:
                     result = ERR_UNEXPECTED_RESULT;
-                    error = checkResult(result, cpuDevice->PC, debugString, "Unexpected destination device.", startTime);
+                    error = checkResult(result, cpuDevice->PC, debugString, "Unexpected destination device.", *startTime);
                     return (error);
                     break;
             }
             
         default:
             result = ERR_UNEXPECTED_RESULT;
-            error = checkResult(result, cpuDevice->PC, debugString, "Unexpected source device.", startTime);
+            error = checkResult(result, cpuDevice->PC, debugString, "Unexpected source device.", *startTime);
             return (error);
             break;
     }

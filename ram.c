@@ -14,7 +14,7 @@ int ramInit(ram_t *ramDevice, uint8_t ramAddress, uint64_t ramSize)
     }
     
     ramDevice->size = ramSize;
-    ramDevice->addressMax = ramAddress + size - 1;
+    ramDevice->addressMax = ramAddress + ramSize - 1;
     if (ramDevice->addressMax > 0xFFFFFFFFFFFFFFFF)
     {
         return(ERR_END_ADDRESS_OUT_OF_RANGE);
@@ -47,19 +47,19 @@ int ramRead(ram_t *ramDevice, uint64_t address, uint64_t *readTo)
 int ramReadBurst(ram_t *ramDevice, uint64_t ramAddress, uint64_t *readTo, uint64_t length)
 {
     /* Check if the destination address isn't too high */
-    if (address > ramDevice->addressMax)
+    if (ramAddress > ramDevice->addressMax)
     {
         return(ERR_ADDRESS_OUT_OF_RANGE);
     }
 
     /* Check if the destination address isn't too low */
-    if (address < ramDevice->address)
+    if (ramAddress < ramDevice->address)
     {
         return(ERR_ADDRESS_OUT_OF_RANGE);
     }
 
     /* Check if the given address range is valid */
-    if ((address + length - 1) > ramDevice->addressMax)
+    if ((ramAddress + length - 1) > ramDevice->addressMax)
     {
         return(ERR_END_ADDRESS_OUT_OF_RANGE);
     }
@@ -98,19 +98,19 @@ int ramWriteBurst(ram_t *ramDevice, uint64_t ramAddress, uint64_t *writeFrom, ui
     uint64_t i;
 
     /* Check if the destination address isn't too high */
-    if (address > ramDevice->addressMax)
+    if (ramAddress > ramDevice->addressMax)
     {
         return(ERR_ADDRESS_OUT_OF_RANGE);
     }
 
     /* Check if the destination address isn't too low */
-    if (address < ramDevice->address)
+    if (ramAddress < ramDevice->address)
     {
         return(ERR_ADDRESS_OUT_OF_RANGE);
     }
 
     /* Check if the given address range is valid */
-    if ((address + length - 1) > ramDevice->addressMax)
+    if ((ramAddress + length - 1) > ramDevice->addressMax)
     {
         return(ERR_END_ADDRESS_OUT_OF_RANGE);
     }
@@ -118,7 +118,7 @@ int ramWriteBurst(ram_t *ramDevice, uint64_t ramAddress, uint64_t *writeFrom, ui
     /* Check if the destination address range is in use */
     for (i = 0; i < length; i++)
     {
-        if (ramDevice->states[address - ramDevice->address + i] == RAM_USED)
+        if (ramDevice->states[ramAddress - ramDevice->address + i] == RAM_USED)
         {
             return(ERR_RAM_ADDRESS_IN_USE);
         }
@@ -127,10 +127,10 @@ int ramWriteBurst(ram_t *ramDevice, uint64_t ramAddress, uint64_t *writeFrom, ui
     /* Mark writted addresses as in use */
     for (i = 0; i < length; i++)
     {
-        ramDevice->states[address - ramDevice->address + i] = RAM_USED;
+        ramDevice->states[ramAddress - ramDevice->address + i] = RAM_USED;
     }
 
-    memcpy(&(ramDevice->ram[address - ramDevice->address]), writeFrom, length);
+    memcpy(&(ramDevice->ram[ramAddress - ramDevice->address]), writeFrom, length);
     return(SUCCESS);
 }
 

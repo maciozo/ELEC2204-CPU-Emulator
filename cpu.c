@@ -1,22 +1,19 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <inttypes.h>
+#include <time.h>
 
 #include "cpu.h"
 #include "errors.h"
 #include "./2204/2204.h"
 
-#ifdef DEBUG
-    #include <time.h>
-#endif
-
 void cpuInit(cpu_t *cpuDevice, uint64_t bootAddress, uint64_t registerCount)
 {
     cpuDevice->PC = bootAddress;
-    cpuDevice-registers = (uint64_t*) malloc(sizeof(uint64_t) * registerCount);
+    cpuDevice->registers = (uint64_t*) malloc(sizeof(uint64_t) * registerCount);
     cpuDevice->registerMax = registerCount;
-
-    return(NULL);
+    return;
 }
 
 err2204_t cpuRun(cpu_t *cpuDevice, ram_t *ramDevice)
@@ -24,20 +21,15 @@ err2204_t cpuRun(cpu_t *cpuDevice, ram_t *ramDevice)
     err2204_t error;
     char debugString[128];
     int result;
-    int sourceDevice;
-    int destinationDevice;
+    time_t startTime = time(NULL);
 
-    #ifdef DEBUG
-        time_t startTime = time(NULL);
-        debugString = "CPU Started";
-        debug(debugString, startTime, INFO);
-    #endif
-
+    sprintf(debugString, "CPU Started");
+    debug(debugString, startTime, INFO);
 
     while(1)
     {
         /* Reading instruction at the address specified by PC */
-        sprintf(debugString, "Reading instruction at %x", cpuDevice->PC);
+        sprintf(debugString, "Reading instruction at %" PRIx64, cpuDevice->PC);
         debug(debugString, startTime, INFO);
         result = ramRead(ramDevice, cpuDevice->PC, &cpuDevice->currentInstruction);
 
@@ -51,7 +43,7 @@ err2204_t cpuRun(cpu_t *cpuDevice, ram_t *ramDevice)
             return(error);
         }
         
-        sprintf(debugString, "Instruction: %x", cpuDevice->currentInstruction);
+        sprintf(debugString, "Instruction: %" PRIx64, cpuDevice->currentInstruction);
         debug(debugString, startTime, INFO);
 
         /* Decode instruction */
@@ -67,7 +59,7 @@ err2204_t cpuRun(cpu_t *cpuDevice, ram_t *ramDevice)
             case COPY:
                 sprintf(debugString, "Instruction: COPY");
                 debug(debugString, startTime, INFO);
-                error = copy2204(cpuDevice, ramDevice, debugString);
+                error = copy2204(cpuDevice, ramDevice, debugString, &startTime);
                 if (error.errnum != SUCCESS)
                 {
                     return (error);
@@ -82,7 +74,9 @@ err2204_t cpuRun(cpu_t *cpuDevice, ram_t *ramDevice)
         }
 
     }
-    return(NULL);
+    error.errnum = ERR_CPU_BREAK;
+    error.address = cpuDevice->PC;
+    return (error);
 }
 
 err2204_t checkResult(int result, uint64_t address, char *debugString, const char *errorText, time_t startTime)
@@ -97,7 +91,7 @@ err2204_t checkResult(int result, uint64_t address, char *debugString, const cha
             debug(debugString, startTime, ERROR);
         #endif
     }
-    return (error)
+    return (error);
 }
 
 int memDirector(uint64_t address, cpu_t *cpuDevice, ram_t *ramDevice)
@@ -137,5 +131,5 @@ void debug(char *string, time_t startTime, int level)
             printf("[%f] %s\n", seconds, string);
         }
     #endif
-    return(NULL);
+    return;
 }

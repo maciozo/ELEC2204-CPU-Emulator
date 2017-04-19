@@ -28,7 +28,7 @@
 --------------------------------------------------------------------------------
 */
 #define COPY 0x0000000000000001
-err2204_t copy2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
+err2204_t copy2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString, time_t *startTime);
 int legalCopy(int sourceDev, int destinationDev);
 
 #endif
