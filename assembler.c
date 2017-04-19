@@ -8,18 +8,6 @@
 #include "errors.h"
 #include "assembler.h"
 
-/* https://gist.github.com/panzi/6856583#gistcomment-1656524 */
-#if defined(_WIN32) || defined(_WIN64) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__) || defined(__CYGWIN__)
-    #include <windows.h>
-    #define htobe64(x) (((uint64_t)htonl(((uint32_t)(((uint64_t)(x)) >> 32)))) | (((uint64_t)htonl(((uint32_t)(x)))) << 32))
-#elif defined(__linux__)
-    #include <endian.h>
-#elif defined(__FreeBSD__) || defined(__NetBSD__)
-    #include <sys/endian.h>
-#elif defined(__OpenBSD__)
-    #include <sys/types.h>
-#endif
-
 int main(int argc, char* argv[])
 {
     if (argc < 3)
