@@ -51,7 +51,7 @@
 
 /* Program exited the main CPU loop for some reason */
 #define ERR_CPU_BREAK -10
-
+#define ERR_CPU_BREAK_STR "The program exited the main CPU loop for some reason. (ERR_CPU_BREAK)"
 
 typedef struct
 {

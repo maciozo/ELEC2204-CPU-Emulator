@@ -46,9 +46,14 @@ void printError(err2204_t *error)
         case ERR_UNKNOWN_INSTRUCTION:
             fprintf(stderr, "Instruction at %" PRIx64 ". " ERR_UNKNOWN_INSTRUCTION_STR "\n", error->address);
             break;
+            
+        case ERR_CPU_BREAK:
+            fprintf(stderr, "Instruction at %" PRIx64 ". " ERR_CPU_BREAK_STR "\n", error->address);
+            break;
 
         default:
             fprintf(stderr, "Instruction at %" PRIx64 ". Unknown error (%i).\n", error->address, error->errnum);
             break;
     }
+    return;
 }
