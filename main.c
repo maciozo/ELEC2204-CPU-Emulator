@@ -3,6 +3,7 @@
 #include "./libconfig-1.5/lib/libconfig.h"
 #include <sys/stat.h>
 #include <stdlib.h>
+#include <inttypes.h>
 
 #include "main.h"
 #include "cpu.h"
@@ -11,6 +12,8 @@
 
 int main(int argc, char* argv[])
 {
+    printf("2204 CPU Emulator\n");
+    
     cpu_t cpuDevice;
     ram_t ramDevice;
 
@@ -28,7 +31,7 @@ int main(int argc, char* argv[])
     err2204_t result;
 
     /* Read the file. If there is an error, report it and exit. */
-    if(! config_read_file(&config, "example.cfg"))
+    if(! config_read_file(&config, "default.cfg"))
     {
         fprintf(stderr, "%s:%d - %s\n", config_error_file(&config),
             config_error_line(&config), config_error_text(&config));
@@ -56,9 +59,10 @@ int main(int argc, char* argv[])
     fclose(bootloader);
 
     getRamInfo(&config, &ramAddress, &ramSize);
+    printf("%" PRIu64 " bytes of RAM starting at %" PRIx64 "\n", ramSize * 64, ramAddress);
     
     registerCount = getRegisterCount(&config);
-    if (registerCount)
+    if (!registerCount)
     {
         return(1);
     }
@@ -100,29 +104,14 @@ int getRamInfo(config_t *config, uint64_t *ramAddress, uint64_t *ramSize)
     int64_t size;
 
     /* Making sure that the RAM has been defined in the config */
-    if(!config_lookup_int64(config, "ram", &addr))
-    {
-        fprintf(stderr, "No RAM device defined.\n");
-        return(1);
-    }
-
-    /* Getting the device address of the RAM */
-    if(config_lookup_int64(config, "ram.address", &addr))
-    {
-        if ((addr == 0) | (addr > 0x00FFFFFF))
-        {
-            fprintf(stderr, "Invalid RAM device address.\n");
-            return(1);
-        }
-        *ramAddress = (uint64_t) addr;
-    }
-    else
+    if(!config_lookup_int64(config, "ramAddress", &addr))
     {
         fprintf(stderr, "No RAM address defined.\n");
         return(1);
     }
+    *ramAddress = (uint64_t) addr;
 
-    if(config_lookup_int64(config, "ram.size", &size))
+    if(config_lookup_int64(config, "ramSize", &size))
     {
         if (size == 0)
         {
@@ -136,7 +125,6 @@ int getRamInfo(config_t *config, uint64_t *ramAddress, uint64_t *ramSize)
         fprintf(stderr, "No RAM size defined.\n");
         return(1);
     }
-
     return(0);
 }
 
@@ -149,7 +137,6 @@ err2204_t boot(const char *bootloaderFilename, ram_t *ramDevice, cpu_t *cpuDevic
     /* Getting the length of the bootloader in bytes */
     stat(bootloaderFilename, &stbuf);
     bootloaderLength = stbuf.st_size;
-    realloc(&stbuf, 0); /* Deallocate stat buffer - no longer needed. */
 
     /* Writing data from bootloader to the front of the RAM */
     bootloaderFd = fopen(bootloaderFilename, "rb");

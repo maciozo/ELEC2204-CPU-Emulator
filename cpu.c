@@ -121,7 +121,7 @@ int memDirector(uint64_t address, cpu_t *cpuDevice, ram_t *ramDevice)
 
 void debug(char *string, time_t startTime, int level)
 {
-    #ifdef DEBUG
+    #ifdef CPU_DEBUG
         if (level <= CPU_DEBUG)
         {
             double seconds;
