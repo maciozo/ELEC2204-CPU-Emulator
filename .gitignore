@@ -1,3 +1,4 @@
 /libconfig*
 *.exe
 *.2204
+*.o

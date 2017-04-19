@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include "./libconfig-1.5/lib/libconfig.h"
+#include "./libconfig/lib/libconfig.h"
 
 #include "cpu.h"
 #include "ram.h"

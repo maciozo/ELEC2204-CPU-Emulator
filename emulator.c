@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
-#include "./libconfig-1.5/lib/libconfig.h"
+#include "./libconfig/lib/libconfig.h"
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <inttypes.h>
