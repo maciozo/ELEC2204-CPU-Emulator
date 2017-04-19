@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <time.h>
+#include <string.h>
 
 #include "cpu.h"
 #include "errors.h"
@@ -55,11 +56,29 @@ err2204_t cpuRun(cpu_t *cpuDevice, ram_t *ramDevice)
                 result = SUCCESS;
                 cpuDevice->PC++;
                 break;
+                
+            case STOP:
+                sprintf(debugString, "Instruction: STOP");
+                debug(debugString, startTime, INFO);
+                error.errnum = SUCCESS;
+                error.address = cpuDevice->PC;
+                return (error);
+                break;
 
             case COPY:
                 sprintf(debugString, "Instruction: COPY");
                 debug(debugString, startTime, INFO);
                 error = copy2204(cpuDevice, ramDevice, debugString, &startTime);
+                if (error.errnum != SUCCESS)
+                {
+                    return (error);
+                }
+                break;
+                
+            case PRNT:
+                sprintf(debugString, "Instruction: PRNT");
+                debug(debugString, startTime, INFO);
+                error = prnt2204(cpuDevice, ramDevice, debugString, &startTime);
                 if (error.errnum != SUCCESS)
                 {
                     return (error);
@@ -122,13 +141,28 @@ int memDirector(uint64_t address, cpu_t *cpuDevice, ram_t *ramDevice)
 void debug(char *string, time_t startTime, int level)
 {
     #ifdef CPU_DEBUG
+        char verbosity[5];
+        
+        switch (level)
+        {
+            case INFO:
+                strcpy(verbosity, "INFO");
+                break;
+            case WARNING:
+                strcpy(verbosity, "WARNING");
+                break;
+            case ERROR:
+                strcpy(verbosity, "ERROR");
+                break;
+        }
+        
         if (level <= CPU_DEBUG)
         {
             double seconds;
 
             time_t currentTime = time(NULL);
             seconds = difftime(currentTime, startTime);
-            printf("[%f] %s\n", seconds, string);
+            printf("[%f] [%s] %s\n", seconds, verbosity, string);
         }
     #endif
     return;
