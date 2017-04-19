@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
-#include "main.h"
+#include "emulator.h"
 #include "cpu.h"
 #include "ram.h"
 #include "errors.h"
