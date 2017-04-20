@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <time.h>
 
 #include "ram.h"
 #include "errors.h"
@@ -31,7 +32,9 @@ typedef struct
 void cpuInit(cpu_t *cpuDevice, uint64_t bootAddress, uint64_t registerCount);
 err2204_t cpuRun(cpu_t *cpuDevice, ram_t *ramDevice);
 int memDirector(uint64_t address, cpu_t *cpuDevice, ram_t *ramDevice);
-void debug(char *string, time_t startTime, int level);
-err2204_t checkResult(int result, uint64_t address, char *debugString, const char *errorText, time_t startTime);
+void debug(char *string, int level);
+err2204_t checkResult(int result, uint64_t address, char *debugString, const char *errorText);
+struct timespec print_current_time_with_ms(void);
+int getArg(cpu_t *cpuDevice, ram_t *ramDevice, int argNumber, char *debugString);
 
 #endif

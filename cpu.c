@@ -4,6 +4,7 @@
 #include <inttypes.h>
 #include <time.h>
 #include <string.h>
+#include <math.h>
 
 #include "cpu.h"
 #include "errors.h"
@@ -22,44 +23,69 @@ err2204_t cpuRun(cpu_t *cpuDevice, ram_t *ramDevice)
     err2204_t error;
     char debugString[128];
     int result;
-    time_t startTime = time(NULL);
 
     sprintf(debugString, "CPU Started");
-    debug(debugString, startTime, INFO);
+    debug(debugString, INFO);
 
     while(1)
     {
         /* Reading instruction at the address specified by PC */
         sprintf(debugString, "Reading instruction at %" PRIx64, cpuDevice->PC);
-        debug(debugString, startTime, INFO);
-        result = ramRead(ramDevice, cpuDevice->PC, &cpuDevice->currentInstruction);
+        debug(debugString, INFO);
+        result = memDirector(cpuDevice->PC, cpuDevice, ramDevice);
+        switch (result)
+        {
+            case DEV_REG:
+                sprintf(debugString, "Reading instruction from DEV_REG");
+                debug(debugString, INFO);
+                result = SUCCESS;
+                cpuDevice->currentInstruction = cpuDevice->registers[cpuDevice->PC];
+                break;
+            case DEV_RAM:
+                sprintf(debugString, "Reading instruction from DEV_RAM");
+                debug(debugString, INFO);
+                result = ramRead(ramDevice, cpuDevice->PC, &cpuDevice->currentInstruction);
+                break;
+            case DEV_NULL:
+                sprintf(debugString, "Reading instruction from DEV_NULL");
+                debug(debugString, WARNING);
+                result = SUCCESS;
+                cpuDevice->currentInstruction = (uint64_t) 0;
+                break;
+            case DEV_INVALID:
+                sprintf(debugString, "Reading instruction from DEV_INVALID");
+                debug(debugString, ERROR);
+                result = ERR_READ_FROM_INVALID;
+                break;
+        }
+        
 
         /* Did we fail to read the instruction? */
         if (result != SUCCESS)
         {
             sprintf(debugString, "Failed. Error %i", result);
-            debug(debugString, startTime, ERROR);
+            debug(debugString, ERROR);
             error.errnum = result;
             error.address = cpuDevice->PC;
             return(error);
         }
         
         sprintf(debugString, "Instruction: %" PRIx64, cpuDevice->currentInstruction);
-        debug(debugString, startTime, INFO);
+        debug(debugString, INFO);
 
         /* Decode instruction */
         switch(cpuDevice->currentInstruction)
         {
             case NOOP:
                 sprintf(debugString, "Instruction: NOOP");
-                debug(debugString, startTime, INFO);
+                debug(debugString, INFO);
                 result = SUCCESS;
                 cpuDevice->PC++;
                 break;
                 
             case STOP:
                 sprintf(debugString, "Instruction: STOP");
-                debug(debugString, startTime, INFO);
+                debug(debugString, INFO);
                 error.errnum = SUCCESS;
                 error.address = cpuDevice->PC;
                 return (error);
@@ -67,8 +93,8 @@ err2204_t cpuRun(cpu_t *cpuDevice, ram_t *ramDevice)
 
             case COPY:
                 sprintf(debugString, "Instruction: COPY");
-                debug(debugString, startTime, INFO);
-                error = copy2204(cpuDevice, ramDevice, debugString, &startTime);
+                debug(debugString, INFO);
+                error = copy2204(cpuDevice, ramDevice, debugString);
                 if (error.errnum != SUCCESS)
                 {
                     return (error);
@@ -77,8 +103,38 @@ err2204_t cpuRun(cpu_t *cpuDevice, ram_t *ramDevice)
                 
             case PRNT:
                 sprintf(debugString, "Instruction: PRNT");
-                debug(debugString, startTime, INFO);
-                error = prnt2204(cpuDevice, ramDevice, debugString, &startTime);
+                debug(debugString, INFO);
+                error = prnt2204(cpuDevice, ramDevice, debugString);
+                if (error.errnum != SUCCESS)
+                {
+                    return (error);
+                }
+                break;
+                
+            case JUML:
+                sprintf(debugString, "Instruction: JUML");
+                debug(debugString, INFO);
+                error = juml2204(cpuDevice, ramDevice, debugString);
+                if (error.errnum != SUCCESS)
+                {
+                    return (error);
+                }
+                break;
+                
+            case STOR:
+                sprintf(debugString, "Instruction: STOR");
+                debug(debugString, INFO);
+                error = stor2204(cpuDevice, ramDevice, debugString);
+                if (error.errnum != SUCCESS)
+                {
+                    return (error);
+                }
+                break;
+                
+            case FREE:
+                sprintf(debugString, "Instruction: FREE");
+                debug(debugString, INFO);
+                error = free2204(cpuDevice, ramDevice, debugString);
                 if (error.errnum != SUCCESS)
                 {
                     return (error);
@@ -98,7 +154,7 @@ err2204_t cpuRun(cpu_t *cpuDevice, ram_t *ramDevice)
     return (error);
 }
 
-err2204_t checkResult(int result, uint64_t address, char *debugString, const char *errorText, time_t startTime)
+err2204_t checkResult(int result, uint64_t address, char *debugString, const char *errorText)
 {
     err2204_t error;
     error.errnum = result;
@@ -107,7 +163,7 @@ err2204_t checkResult(int result, uint64_t address, char *debugString, const cha
     {
         #ifdef DEBUG
             sprintf(debugString, "%s (Error %i)", errorText, result);
-            debug(debugString, startTime, ERROR);
+            debug(debugString, ERROR);
         #endif
     }
     return (error);
@@ -138,10 +194,13 @@ int memDirector(uint64_t address, cpu_t *cpuDevice, ram_t *ramDevice)
     return(DEV_INVALID);
 }
 
-void debug(char *string, time_t startTime, int level)
+void debug(char *string, int level)
 {
     #ifdef CPU_DEBUG
         char verbosity[5];
+        struct timespec spec = print_current_time_with_ms();
+        long ms; // Milliseconds
+        time_t s;  // Seconds
         
         switch (level)
         {
@@ -158,12 +217,58 @@ void debug(char *string, time_t startTime, int level)
         
         if (level <= CPU_DEBUG)
         {
-            double seconds;
-
-            time_t currentTime = time(NULL);
-            seconds = difftime(currentTime, startTime);
-            printf("[%f] [%s] %s\n", seconds, verbosity, string);
+            s  = spec.tv_sec;
+            ms = round(spec.tv_nsec / 1.0e6); // Convert nanoseconds to milliseconds
+            printf("[%" PRIdMAX ".%03ld] [%s] %s\n", (intmax_t ) s, ms, verbosity, string);
         }
     #endif
     return;
+}
+
+/* http://stackoverflow.com/a/17371925 */
+struct timespec print_current_time_with_ms(void)
+{
+    struct timespec spec;
+
+    clock_gettime(CLOCK_REALTIME, &spec);
+    
+    return (spec);
+}
+
+int getArg(cpu_t *cpuDevice, ram_t *ramDevice, int argNumber, char *debugString)
+{
+    int sourceDevice;
+    int result;
+    
+    sourceDevice = memDirector(cpuDevice->PC, cpuDevice, ramDevice);
+    switch (sourceDevice)
+    {
+        case DEV_REG:
+            sprintf(debugString, "Reading from DEV_REG");
+            debug(debugString, INFO);
+            result = SUCCESS;
+            cpuDevice->arguments[argNumber] = cpuDevice->registers[cpuDevice->PC];
+            break;
+        case DEV_RAM:
+            sprintf(debugString, "Reading from DEV_RAM");
+            debug(debugString, INFO);
+            result = ramRead(ramDevice, cpuDevice->PC, &cpuDevice->arguments[argNumber]);
+            break;
+        case DEV_NULL:
+            sprintf(debugString, "Reading from DEV_NULL");
+            debug(debugString, WARNING);
+            result = SUCCESS;
+            cpuDevice->arguments[argNumber] = (uint64_t) 0;
+            break;
+        case DEV_INVALID:
+            sprintf(debugString, "Reading from DEV_INVALID");
+            debug(debugString, ERROR);
+            result = ERR_READ_FROM_INVALID;
+            break;
+        default:
+            sprintf(debugString, "Reading from ???");
+            debug(debugString, ERROR);
+            result = ERR_UNEXPECTED_RESULT;
+    }
+    return (result);
 }

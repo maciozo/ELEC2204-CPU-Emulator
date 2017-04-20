@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
     FILE *inputFile;
     FILE *outputFile;
     char inputLine[1024];
-    uint64_t lineNumber = 1;
+    uint64_t lineNumber = 0;
     int result;
     err2204_t error;
     
@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
         printf("\n");
         if (result != SUCCESS)
         {
-            fprintf(stderr, "Line %" PRIu64 ": %i", lineNumber, result);
+            fprintf(stderr, "Line %" PRIu64 ": (error %i) ", lineNumber, result);
             error.errnum = result;
             error.address = lineNumber;
             printError(&error);
@@ -61,8 +61,29 @@ int assemble(char *inputLine, FILE *outputFile, uint64_t lineNumber)
 {
     uint64_t word;
     char instruction[5] = "XXXX";
+    int col;
+    int lineLength;
     
-    memcpy(instruction, inputLine, 4);
+    lineLength = strlen(inputLine);
+    for (col = 0; col < lineLength; col++)
+    {
+        if (!((inputLine[col] == '\n') || (inputLine[col] == '\r') || (inputLine[col] == ' ') || (inputLine[col] == '\0') || (inputLine[col] == ';')))
+        {
+            break;
+        }
+        if (inputLine[col] == ';')
+        {
+            printf("Comment\n");
+            return(SUCCESS);
+        }
+    }
+    if (col == lineLength)
+    {
+        printf("Blank line\n");
+        return (SUCCESS);
+    }
+    
+    memcpy(instruction, inputLine + col, 4);
     
     /* Determine instruction */
     if (!strcmp(instruction, "NOOP"))
@@ -95,6 +116,30 @@ int assemble(char *inputLine, FILE *outputFile, uint64_t lineNumber)
         printf("%s -> %" PRIx64 "\n", instruction, word);
         fwrite(&word, sizeof(uint64_t), 1, outputFile);
         return (oneArg(inputLine, outputFile));
+    }
+    
+    else if (!strcmp(instruction, "JUML"))
+    {
+        word = JUML;
+        printf("%s -> %" PRIx64 "\n", instruction, word);
+        fwrite(&word, sizeof(uint64_t), 1, outputFile);
+        return (oneArg(inputLine, outputFile));
+    }
+    
+    else if (!strcmp(instruction, "STOR"))
+    {
+        word = STOR;
+        printf("%s -> %" PRIx64 "\n", instruction, word);
+        fwrite(&word, sizeof(uint64_t), 1, outputFile);
+        return (twoArgs(inputLine, outputFile));
+    }
+    
+    else if (!strcmp(instruction, "FREE"))
+    {
+        word = FREE;
+        printf("%s -> %" PRIx64 "\n", instruction, word);
+        fwrite(&word, sizeof(uint64_t), 1, outputFile);
+        return (twoArgs(inputLine, outputFile));
     }
     
     else
@@ -135,7 +180,7 @@ int oneArg(char *inputLine, FILE *outputFile)
 
 int twoArgs(char *inputLine, FILE *outputFile)
 {
-    char arg[19];
+    char arg[19] = "                  ";
     int lineLength;
     int startCol;
     int col;
