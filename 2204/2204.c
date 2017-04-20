@@ -1,0 +1,5 @@
+#include "copy.c"
+#include "free.c"
+#include "juml.c"
+#include "prnt.c"
+#include "stor.c"
