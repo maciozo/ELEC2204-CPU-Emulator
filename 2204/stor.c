@@ -22,6 +22,8 @@ err2204_t stor2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString)
     {
         return (error);
     }
+    /* cpuDevice->PC++; */
+    sprintf(debugString, "Destination address: %" PRIx64, cpuDevice->arguments[0]);
 
     /* Get destination device */
     sprintf(debugString, "Getting destination device.");

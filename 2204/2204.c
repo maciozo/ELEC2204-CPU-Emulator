@@ -12,3 +12,5 @@
 #include "nanda.c"
 #include "nora.c"
 #include "xora.c"
+#include "jumpeq.c"
+#include "jumpeqp.c"

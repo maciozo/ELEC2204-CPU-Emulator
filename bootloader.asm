@@ -21,4 +21,15 @@ NORA 0x02, 0x03, 0x107 ;*0x107 = ~(1000 | 1234) = 0xFFFFF805?
 PRNT 0x107 ;Should print 0xFFFFF805
 XORA 0x02, 0x03, 0x108 ;*0x108 = 1000 ^ 1234 = 1850?
 PRND 0x108 ;Should print 1850
+STOR 0x04, 1000 ;Store 1000 in address 2
+JEQA 0x02, 0x04, 0x8E ;If 1000 == 1000, jump to 0x8F
+STOR 0x05, 9090909090909090 ;Should be skipped
+PRND 0x05 ;Should be skipped
+PRND 0x03 ;Should print 1234
+STOR 0x05, 9090909090909090 ;Store 9090909090909090 in address 5
+JEQP 0x01, 0x02, 3 ;If 1 == 1000, jump 2 addresses forward
+PRND 0x05 ;Should print 9090909090909090
+JEQP 0x02, 0x02, 3 ;If 1000 == 1000, jump 2 addresses forward
+PRND 0x02 ;Should be skipped
+PRND 0x05 ;Should print 9090909090909090
 STOP ;Stop

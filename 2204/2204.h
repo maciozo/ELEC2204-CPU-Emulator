@@ -155,7 +155,7 @@ err2204_t anda2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
     Bin Layout  0x000000000000000C
                 0x????????????????
                 0x????????????????
-    Note        Both operands must be in the CPU registers
+    Note        Operand must be in the CPU registers
                 Can be written back to any device
 --------------------------------------------------------------------------------
 */
@@ -203,5 +203,36 @@ err2204_t nora2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
 */
 #define XORA 0x000000000000000F
 err2204_t xora2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
+
+/*
+----If the values of the first two addresses are equal, jump to the 3rd address-
+    ASM Layout  JEQA <64bit address>, <64bit address>, <64bit address>
+    Bin Layout  0x0000000000000010
+                0x????????????????
+                0x????????????????
+                0x????????????????
+    Note        Both operands must be in the CPU registers
+                Can jump to any device
+--------------------------------------------------------------------------------
+*/
+#define JEQA 0x0000000000000010
+err2204_t jumpeq2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
+
+/*
+----If the values of the first two addresses are equal, jump the specified 
+                                                number of addresses forward-----
+    ASM Layout  JEQP <64bit address>, <64bit address>, <64bit distance>
+    Bin Layout  0x0000000000000011
+                0x????????????????
+                0x????????????????
+                0x????????????????
+    Note        Both operands must be in the CPU registers
+                Can jump to any device
+                Distance will be counted from the end of the last JEQP
+                    instruction word
+--------------------------------------------------------------------------------
+*/
+#define JEQP 0x0000000000000011
+err2204_t jumpeqp2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
 
 #endif
