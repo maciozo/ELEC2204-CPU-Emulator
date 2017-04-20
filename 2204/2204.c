@@ -10,3 +10,5 @@
 #include "anda.c"
 #include "nota.c"
 #include "nanda.c"
+#include "nora.c"
+#include "xora.c"

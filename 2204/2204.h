@@ -176,4 +176,32 @@ err2204_t nota2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
 #define NNDA 0x000000000000000D
 err2204_t nanda2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
 
+/*
+----NOR the value at the 1st address with the 2nd. Store result in 3rd----------
+    ASM Layout  NORA <64bit address>, <64bit address>, <64bit address>
+    Bin Layout  0x000000000000000E
+                0x????????????????
+                0x????????????????
+                0x????????????????
+    Note        Both operands must be in the CPU registers
+                Can be written back to any device
+--------------------------------------------------------------------------------
+*/
+#define NORA 0x000000000000000E
+err2204_t nora2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
+
+/*
+----XOR the value at the 1st address with the 2nd. Store result in 3rd----------
+    ASM Layout  XORA <64bit address>, <64bit address>, <64bit address>
+    Bin Layout  0x000000000000000F
+                0x????????????????
+                0x????????????????
+                0x????????????????
+    Note        Both operands must be in the CPU registers
+                Can be written back to any device
+--------------------------------------------------------------------------------
+*/
+#define XORA 0x000000000000000F
+err2204_t xora2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
+
 #endif
