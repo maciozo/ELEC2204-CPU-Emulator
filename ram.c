@@ -7,6 +7,7 @@
 
 int ramInit(ram_t *ramDevice, uint8_t ramAddress, uint64_t ramSize)
 {
+    uint64_t i;
     ramDevice->address = ramAddress;
     if (ramDevice->address < 2)
     {
@@ -22,6 +23,12 @@ int ramInit(ram_t *ramDevice, uint8_t ramAddress, uint64_t ramSize)
     
     ramDevice->ram = (uint64_t*) malloc(sizeof(uint64_t) * ramSize);
     ramDevice->states = (uint8_t*) malloc(sizeof(uint8_t) * ramSize);
+    
+    for (i = 0; i < ramSize; i++)
+    {
+        ramDevice->ram[i] = (uint64_t) 0;
+        ramDevice->states[i] = RAM_FREE;
+    }
     
     return(SUCCESS);
 }

@@ -133,15 +133,23 @@ err2204_t boot(const char *bootloaderFilename, ram_t *ramDevice, cpu_t *cpuDevic
     struct stat stbuf;
     int bootloaderLength;
     FILE *bootloaderFd;
+    uint64_t wordCount;
+    uint64_t i;
 
     /* Getting the length of the bootloader in bytes */
     stat(bootloaderFilename, &stbuf);
     bootloaderLength = stbuf.st_size;
+    wordCount = bootloaderLength / 8;
 
     /* Writing data from bootloader to the front of the RAM */
     bootloaderFd = fopen(bootloaderFilename, "rb");
-    fread(ramDevice->ram, sizeof(uint64_t), bootloaderLength / 8, bootloaderFd);
+    fread(ramDevice->ram, sizeof(uint64_t), wordCount, bootloaderFd);
     fclose(bootloaderFd);
+    
+    for (i = 0; i < wordCount; i++)
+    {
+        ramDevice->states[i] = RAM_USED;
+    }
 
     return(cpuRun(cpuDevice, ramDevice));
 }
