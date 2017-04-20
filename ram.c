@@ -6,6 +6,7 @@
 
 #include "ram.h"
 #include "errors.h"
+#include "./2204/2204.h"
 
 int ramInit(ram_t *ramDevice, uint8_t ramAddress, uint64_t ramSize)
 {
@@ -29,7 +30,7 @@ int ramInit(ram_t *ramDevice, uint8_t ramAddress, uint64_t ramSize)
     
     for (i = 0; i < ramSize; i++)
     {
-        ramDevice->ram[i] = (uint64_t) 0;
+        ramDevice->ram[i] = STOP;
         ramDevice->states[i] = RAM_FREE;
     }
     
