@@ -1,6 +1,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
+#include <inttypes.h>
 
 #include "ram.h"
 #include "errors.h"
@@ -16,6 +18,7 @@ int ramInit(ram_t *ramDevice, uint8_t ramAddress, uint64_t ramSize)
     
     ramDevice->size = ramSize;
     ramDevice->addressMax = ramAddress + ramSize - 1;
+    printf("Max RAM address: 0x%" PRIx64 "\n", ramDevice->addressMax);
     if (ramDevice->addressMax > 0xFFFFFFFFFFFFFFFF)
     {
         return(ERR_END_ADDRESS_OUT_OF_RANGE);
@@ -80,13 +83,13 @@ int ramWrite(ram_t *ramDevice, uint64_t address, uint64_t data)
     /* Check if the destination address isn't too high */
     if (address > ramDevice->addressMax)
     {
-        return(ERR_ADDRESS_OUT_OF_RANGE);
+        return(ERR_ADDRESS_TOO_HIGH);
     }
 
     /* Check if the destination address isn't too low */
     if (address < ramDevice->address)
     {
-        return(ERR_ADDRESS_OUT_OF_RANGE);
+        return(ERR_ADDRESS_TOO_LOW);
     }
 
     /* Check if the destination address is in use */

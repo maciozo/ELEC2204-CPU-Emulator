@@ -72,7 +72,8 @@ int ramReadBurst(ram_t *ramDevice, uint64_t address, uint64_t *readTo, uint64_t 
     address:        RAM address to write to.
     data:           Word to write to the specified RAM address.
 ====================
-    Returns         ERR_ADDRESS_OUT_OF_RANGE
+    Returns         ERR_ADDRESS_TOO_HIGH
+                    ERR_ADDRESS_TOO_LOW
                     ERR_RAM_ADDRESS_IN_USE
                     SUCCESS
 ================================================================================

@@ -41,7 +41,7 @@ err2204_t stor2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString)
         return (error);
     }
     
-    sprintf(debugString, "Data: %" PRIx64, cpuDevice->arguments[1]);
+    sprintf(debugString, "Data: 0x%" PRIx64, cpuDevice->arguments[1]);
     debug(debugString, INFO);
 
     /* Write data */

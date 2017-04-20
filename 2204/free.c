@@ -23,11 +23,13 @@ err2204_t free2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString)
     }
     
     /* Check if we're actually freeing a RAM address */
-    destinationDevice = memDirector(cpuDevice->registers[0], cpuDevice, ramDevice);
+    destinationDevice = memDirector(cpuDevice->arguments[0], cpuDevice, ramDevice);
     if (destinationDevice != DEV_RAM)
     {
-        sprintf(debugString, "Attempt to free non-RAM address.");
+        sprintf(debugString, "Attempt to free non-RAM address (%" PRIx64 ").", cpuDevice->arguments[0]);
         debug(debugString, WARNING);
+        cpuDevice++;
+        cpuDevice++;
         return (error);
     }
     
@@ -43,7 +45,8 @@ err2204_t free2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString)
     }
     
     /* Free the memory address */
-    sprintf(debugString, "Freeing address %" PRIx64 " to %" PRIx64 "\n", cpuDevice->arguments[0], cpuDevice->arguments[0] + cpuDevice->arguments[1]);
+    sprintf(debugString, "Freeing address 0x%" PRIx64 " to 0x%" PRIx64, cpuDevice->arguments[0], cpuDevice->arguments[0] + cpuDevice->arguments[1] - 1);
+    debug(debugString, INFO);
     result = ramFree(ramDevice, cpuDevice->arguments[0], cpuDevice->arguments[1]);
     error = checkResult(result, cpuDevice->PC, debugString, "Failed to read from device.");
     if (result != SUCCESS)
@@ -51,7 +54,6 @@ err2204_t free2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString)
         return (error);
     }
     
-    debug(debugString, INFO);
     cpuDevice->PC++;
     return (error);
 }

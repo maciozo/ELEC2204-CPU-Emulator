@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
     fclose(bootloader);
 
     getRamInfo(&config, &ramAddress, &ramSize);
-    printf("%" PRIu64 " bytes of RAM starting at %" PRIx64 "\n", ramSize * 64, ramAddress);
+    printf("%" PRIu64 " bytes of RAM starting at 0x%" PRIx64 "\n", ramSize * 64, ramAddress);
     
     registerCount = getRegisterCount(&config);
     if (!registerCount)

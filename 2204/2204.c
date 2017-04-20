@@ -3,3 +3,6 @@
 #include "juml.c"
 #include "prnt.c"
 #include "stor.c"
+#include "adda.c"
+#include "suba.c"
+#include "prnd.c"

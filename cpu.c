@@ -30,7 +30,7 @@ err2204_t cpuRun(cpu_t *cpuDevice, ram_t *ramDevice)
     while(1)
     {
         /* Reading instruction at the address specified by PC */
-        sprintf(debugString, "Reading instruction at %" PRIx64, cpuDevice->PC);
+        sprintf(debugString, "Reading instruction at 0x%" PRIx64, cpuDevice->PC);
         debug(debugString, INFO);
         result = memDirector(cpuDevice->PC, cpuDevice, ramDevice);
         switch (result)
@@ -70,7 +70,7 @@ err2204_t cpuRun(cpu_t *cpuDevice, ram_t *ramDevice)
             return(error);
         }
         
-        sprintf(debugString, "Instruction: %" PRIx64, cpuDevice->currentInstruction);
+        sprintf(debugString, "Instruction: 0x%" PRIx64, cpuDevice->currentInstruction);
         debug(debugString, INFO);
 
         /* Decode instruction */
@@ -141,6 +141,36 @@ err2204_t cpuRun(cpu_t *cpuDevice, ram_t *ramDevice)
                 }
                 break;
                 
+            case ADDA:
+                sprintf(debugString, "Instruction: ADDA");
+                debug(debugString, INFO);
+                error = adda2204(cpuDevice, ramDevice, debugString);
+                if (error.errnum != SUCCESS)
+                {
+                    return (error);
+                }
+                break;
+                
+            case SUBA:
+                sprintf(debugString, "Instruction: SUBA");
+                debug(debugString, INFO);
+                error = suba2204(cpuDevice, ramDevice, debugString);
+                if (error.errnum != SUCCESS)
+                {
+                    return (error);
+                }
+                break;
+                
+            case PRND:
+                sprintf(debugString, "Instruction: PRND");
+                debug(debugString, INFO);
+                error = prnd2204(cpuDevice, ramDevice, debugString);
+                if (error.errnum != SUCCESS)
+                {
+                    return (error);
+                }
+                break;
+                
             default:
                 error.errnum = ERR_UNKNOWN_INSTRUCTION;
                 error.address = cpuDevice->PC;
@@ -161,7 +191,7 @@ err2204_t checkResult(int result, uint64_t address, char *debugString, const cha
     error.address = address;
     if (result != SUCCESS)
     {
-        #ifdef DEBUG
+        #ifdef CPU_DEBUG
             sprintf(debugString, "%s (Error %i)", errorText, result);
             debug(debugString, ERROR);
         #endif

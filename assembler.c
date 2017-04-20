@@ -52,6 +52,7 @@ int main(int argc, char* argv[])
             printError(&error);
             return(result);
         }
+        printf("================================================================================\n");
     }
     
     return (0);
@@ -89,7 +90,7 @@ int assemble(char *inputLine, FILE *outputFile, uint64_t lineNumber)
     if (!strcmp(instruction, "NOOP"))
     {
         word = NOOP;
-        printf("%s -> %" PRIx64 "\n", instruction, word);
+        printf("%s -> 0x%" PRIx64 "\n", instruction, word);
         fwrite(&word, sizeof(uint64_t), 1, outputFile);
         return (SUCCESS);
     }
@@ -97,7 +98,7 @@ int assemble(char *inputLine, FILE *outputFile, uint64_t lineNumber)
     else if (!strcmp(instruction, "STOP"))
     {
         word = STOP;
-        printf("%s -> %" PRIx64 "\n", instruction, word);
+        printf("%s -> 0x%" PRIx64 "\n", instruction, word);
         fwrite(&word, sizeof(uint64_t), 1, outputFile);
         return (SUCCESS);
     }
@@ -105,7 +106,7 @@ int assemble(char *inputLine, FILE *outputFile, uint64_t lineNumber)
     else if (!strcmp(instruction, "COPY"))
     {
         word = COPY;
-        printf("%s -> %" PRIx64 "\n", instruction, word);
+        printf("%s -> 0x%" PRIx64 "\n", instruction, word);
         fwrite(&word, sizeof(uint64_t), 1, outputFile);
         return (twoArgs(inputLine, outputFile));
     }
@@ -113,7 +114,7 @@ int assemble(char *inputLine, FILE *outputFile, uint64_t lineNumber)
     else if (!strcmp(instruction, "PRNT"))
     {
         word = PRNT;
-        printf("%s -> %" PRIx64 "\n", instruction, word);
+        printf("%s -> 0x%" PRIx64 "\n", instruction, word);
         fwrite(&word, sizeof(uint64_t), 1, outputFile);
         return (oneArg(inputLine, outputFile));
     }
@@ -121,7 +122,7 @@ int assemble(char *inputLine, FILE *outputFile, uint64_t lineNumber)
     else if (!strcmp(instruction, "JUML"))
     {
         word = JUML;
-        printf("%s -> %" PRIx64 "\n", instruction, word);
+        printf("%s -> 0x%" PRIx64 "\n", instruction, word);
         fwrite(&word, sizeof(uint64_t), 1, outputFile);
         return (oneArg(inputLine, outputFile));
     }
@@ -129,7 +130,7 @@ int assemble(char *inputLine, FILE *outputFile, uint64_t lineNumber)
     else if (!strcmp(instruction, "STOR"))
     {
         word = STOR;
-        printf("%s -> %" PRIx64 "\n", instruction, word);
+        printf("%s -> 0x%" PRIx64 "\n", instruction, word);
         fwrite(&word, sizeof(uint64_t), 1, outputFile);
         return (twoArgs(inputLine, outputFile));
     }
@@ -137,9 +138,33 @@ int assemble(char *inputLine, FILE *outputFile, uint64_t lineNumber)
     else if (!strcmp(instruction, "FREE"))
     {
         word = FREE;
-        printf("%s -> %" PRIx64 "\n", instruction, word);
+        printf("%s -> 0x%" PRIx64 "\n", instruction, word);
         fwrite(&word, sizeof(uint64_t), 1, outputFile);
         return (twoArgs(inputLine, outputFile));
+    }
+    
+    else if (!strcmp(instruction, "ADDA"))
+    {
+        word = ADDA;
+        printf("%s -> 0x%" PRIx64 "\n", instruction, word);
+        fwrite(&word, sizeof(uint64_t), 1, outputFile);
+        return (threeArgs(inputLine, outputFile));
+    }
+    
+    else if (!strcmp(instruction, "SUBA"))
+    {
+        word = SUBA;
+        printf("%s -> 0x%" PRIx64 "\n", instruction, word);
+        fwrite(&word, sizeof(uint64_t), 1, outputFile);
+        return (threeArgs(inputLine, outputFile));
+    }
+    
+    else if (!strcmp(instruction, "PRND"))
+    {
+        word = PRND;
+        printf("%s -> 0x%" PRIx64 "\n", instruction, word);
+        fwrite(&word, sizeof(uint64_t), 1, outputFile);
+        return (oneArg(inputLine, outputFile));
     }
     
     else
@@ -173,7 +198,7 @@ int oneArg(char *inputLine, FILE *outputFile)
     }
     strncpy(arg, inputLine +  5, i - 1);
     word = strtoull(arg, NULL, 0);
-    printf("%s -> %" PRIx64 "\n", arg, word);
+    printf("%s -> 0x%" PRIx64 "\n", arg, word);
     fwrite(&word, sizeof(uint64_t), 1, outputFile);
     return (SUCCESS);
 }
@@ -204,8 +229,9 @@ int twoArgs(char *inputLine, FILE *outputFile)
     }
     strncpy(arg, inputLine +  5, i);
     word = strtoull(arg, NULL, 0);
-    printf("%s -> %" PRIx64 "\n", arg, word);
+    printf("%s -> 0x%" PRIx64 "\n", arg, word);
     fwrite(&word, sizeof(uint64_t), 1, outputFile);
+    strcpy(arg, "                  ");
     
     /* Getting the position of the second address in the asm file */
     for (col++; col < lineLength; col++)
@@ -229,7 +255,94 @@ int twoArgs(char *inputLine, FILE *outputFile)
     }
     strncpy(arg, inputLine + startCol, i);
     word = strtoull(arg, NULL, 0);
-    printf("%s -> %" PRIx64 "\n", arg, word);
+    printf("%s -> 0x%" PRIx64 "\n", arg, word);
+    fwrite(&word, sizeof(uint64_t), 1, outputFile);
+    
+    return (SUCCESS);
+}
+
+int threeArgs(char *inputLine, FILE *outputFile)
+{
+    char arg[19] = "                  ";
+    int lineLength;
+    int startCol;
+    int col;
+    int i;
+    uint64_t word;
+    
+    lineLength = strlen(inputLine);
+    
+    /* Getting the length of the first address in the asm file */
+    i = 0;
+    for (col = 5; col < lineLength; col++)
+    {
+        if (inputLine[col] != ',')
+        {
+            i++;
+        }
+        else
+        {
+            break;
+        }
+    }
+    strncpy(arg, inputLine +  5, i);
+    word = strtoull(arg, NULL, 0);
+    printf("%s -> 0x%" PRIx64 "\n", arg, word);
+    fwrite(&word, sizeof(uint64_t), 1, outputFile);
+    strcpy(arg, "                  ");
+    
+    /* Getting the position of the second address in the asm file */
+    for (col++; col < lineLength; col++)
+    {
+        if (inputLine[col] != ' ')
+        {
+            break;
+        }
+    }
+    startCol = col;
+    
+    /* Getting the length of the second address in the asm file */
+    i = 0;
+    for (; col < lineLength; col++)
+    {
+        if (inputLine[col] != ',')
+        {
+            i++;
+        }
+        else
+        {
+            break;
+        }
+    }
+    strncpy(arg, inputLine + startCol, i);
+    word = strtoull(arg, NULL, 0);
+    printf("%s -> 0x%" PRIx64 "\n", arg, word);
+    fwrite(&word, sizeof(uint64_t), 1, outputFile);
+    strcpy(arg, "                  ");
+    
+    /* Getting the position of the third address in the asm file */
+    for (col++; col < lineLength; col++)
+    {
+        if (inputLine[col] != ' ')
+        {
+            break;
+        }
+    }
+    startCol = col;
+    
+    /* Getting the length of the third address in the asm file */
+    i = 0;
+    for (; col < lineLength; col++)
+    {
+        if ((inputLine[col] == ' ') || (inputLine[col] == ';') || (inputLine[col] == '\n') || (inputLine[col] == '\r'))
+        {
+            break;
+        }
+        i++;
+    }
+    strncpy(arg, inputLine + startCol, i);
+    word = strtoull(arg, NULL, 0);
+    printf("%s -> 0x%" PRIx64 "\n", arg, word);
     fwrite(&word, sizeof(uint64_t), 1, outputFile);
     
     return (SUCCESS);

@@ -5,7 +5,7 @@
 #include "../cpu.h"
 #include "../ram.h"
 
-err2204_t prnt2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString)
+err2204_t prnd2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString)
 {
     int result;
     int sourceDevice;
@@ -31,12 +31,12 @@ err2204_t prnt2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString)
         case DEV_NULL:
             sprintf(debugString, "Printing from DEV_NULL.");
             debug(debugString, WARNING);
-            printf("0x%" PRIx64 "\n", (uint64_t) 0);
+            printf("%" PRIu64 "\n", (uint64_t) 0);
             break;
         case DEV_REG:
             sprintf(debugString, "Printing from DEV_REG address 0x%" PRIx64 ".", cpuDevice->arguments[0]);
             debug(debugString, INFO);
-            printf("0x%" PRIx64 "\n", cpuDevice->registers[cpuDevice->arguments[0]]);
+            printf("%" PRIu64 "\n", cpuDevice->registers[cpuDevice->arguments[0]]);
             break;
         case DEV_RAM:
             sprintf(debugString, "Printing from DEV_RAM address 0x%" PRIx64 ".", cpuDevice->arguments[0]);
@@ -47,7 +47,7 @@ err2204_t prnt2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString)
             {
                 return (error);
             }
-            printf("0x%" PRIx64 "\n", data);
+            printf("%" PRIu64 "\n", data);
             break;
         default:
             sprintf(debugString, "Printing from ??? address 0x%" PRIx64 ".", cpuDevice->arguments[0]);

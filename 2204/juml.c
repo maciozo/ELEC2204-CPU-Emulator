@@ -22,7 +22,7 @@ err2204_t juml2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString)
     }
     
     /* Set programme counter to new address */
-    sprintf(debugString, "Jumping to address %" PRIx64 "\n", cpuDevice->arguments[0]);
+    sprintf(debugString, "Jumping to address 0x%" PRIx64 "\n", cpuDevice->arguments[0]);
     debug(debugString, INFO);
     cpuDevice->PC = cpuDevice->arguments[0];
     return (error);

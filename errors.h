@@ -53,6 +53,14 @@
 #define ERR_CPU_BREAK -10
 #define ERR_CPU_BREAK_STR "The program exited the main CPU loop for some reason. (ERR_CPU_BREAK)"
 
+/* The specified address is too high */
+#define ERR_ADDRESS_TOO_HIGH -11
+#define ERR_ADDRESS_TOO_HIGH_STR "The program tried to access data from an address beyond the device's range. (ERR_ADDRESS_TOO_HIGH)"
+
+/* The specified address is too low */
+#define ERR_ADDRESS_TOO_LOW -12
+#define ERR_ADDRESS_TOO_LOW_STR "The program tried to access data from an address BELOW the device's range. (ERR_ADDRESS_TOO_LOW)"
+
 typedef struct
 {
     int errnum;
