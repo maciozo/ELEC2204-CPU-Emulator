@@ -16,32 +16,7 @@ err2204_t prnt2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString)
     cpuDevice->PC++;
     sprintf(debugString, "Getting source address.");
     debug(debugString, INFO);
-    sourceDevice = memDirector(cpuDevice->PC, cpuDevice, ramDevice);
-    switch (sourceDevice)
-    {
-        case DEV_REG:
-            sprintf(debugString, "Reading address from DEV_REG");
-            debug(debugString, INFO);
-            result = SUCCESS;
-            cpuDevice->arguments[0] = cpuDevice->registers[cpuDevice->PC];
-            break;
-        case DEV_RAM:
-            sprintf(debugString, "Reading address from DEV_RAM");
-            debug(debugString, INFO);
-            result = ramRead(ramDevice, cpuDevice->PC, &cpuDevice->arguments[0]);
-            break;
-        case DEV_NULL:
-            sprintf(debugString, "Reading address from DEV_NULL");
-            debug(debugString, WARNING);
-            result = SUCCESS;
-            cpuDevice->arguments[0] = (uint64_t) 0;
-            break;
-        case DEV_INVALID:
-            sprintf(debugString, "Reading address from DEV_INVALID");
-            debug(debugString, ERROR);
-            result = ERR_READ_FROM_INVALID;
-            break;
-    }
+    result = getArg(cpuDevice, ramDevice, 0, debugString);
     error = checkResult(result, cpuDevice->PC, debugString, "Failed to read from device.");
     if (result != SUCCESS)
     {
