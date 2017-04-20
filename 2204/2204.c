@@ -6,3 +6,7 @@
 #include "adda.c"
 #include "suba.c"
 #include "prnd.c"
+#include "orad.c"
+#include "anda.c"
+#include "nota.c"
+#include "nanda.c"

@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
 {
     if (argc < 3)
     {
-        printf("Usage assembler <input> <output>\n");
+        printf("Usage: assembler <input> <output>\n");
         return (1);
     }
     
@@ -165,6 +165,38 @@ int assemble(char *inputLine, FILE *outputFile, uint64_t lineNumber)
         printf("%s -> 0x%" PRIx64 "\n", instruction, word);
         fwrite(&word, sizeof(uint64_t), 1, outputFile);
         return (oneArg(inputLine, outputFile));
+    }
+    
+    else if (!strcmp(instruction, "ORAD"))
+    {
+        word = ORAD;
+        printf("%s -> 0x%" PRIx64 "\n", instruction, word);
+        fwrite(&word, sizeof(uint64_t), 1, outputFile);
+        return (threeArgs(inputLine, outputFile));
+    }
+    
+    else if (!strcmp(instruction, "ANDA"))
+    {
+        word = ANDA;
+        printf("%s -> 0x%" PRIx64 "\n", instruction, word);
+        fwrite(&word, sizeof(uint64_t), 1, outputFile);
+        return (threeArgs(inputLine, outputFile));
+    }
+    
+    else if (!strcmp(instruction, "NOTA"))
+    {
+        word = NOTA;
+        printf("%s -> 0x%" PRIx64 "\n", instruction, word);
+        fwrite(&word, sizeof(uint64_t), 1, outputFile);
+        return (twoArgs(inputLine, outputFile));
+    }
+    
+    else if (!strcmp(instruction, "NNDA"))
+    {
+        word = NNDA;
+        printf("%s -> 0x%" PRIx64 "\n", instruction, word);
+        fwrite(&word, sizeof(uint64_t), 1, outputFile);
+        return (threeArgs(inputLine, outputFile));
     }
     
     else

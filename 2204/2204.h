@@ -121,4 +121,59 @@ err2204_t suba2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
 #define PRND 0x0000000000000009
 err2204_t prnd2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
 
+/*
+----OR the value at the 1st address with the 2nd. Store result in 3rd-----------
+    ASM Layout  ORAD <64bit address>, <64bit address>, <64bit address>
+    Bin Layout  0x000000000000000A
+                0x????????????????
+                0x????????????????
+                0x????????????????
+    Note        Both operands must be in the CPU registers
+                Can be written back to any device
+--------------------------------------------------------------------------------
+*/
+#define ORAD 0x000000000000000A
+err2204_t orad2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
+
+/*
+----AND the value at the 1st address with the 2nd. Store result in 3rd----------
+    ASM Layout  ANDA <64bit address>, <64bit address>, <64bit address>
+    Bin Layout  0x000000000000000C
+                0x????????????????
+                0x????????????????
+                0x????????????????
+    Note        Both operands must be in the CPU registers
+                Can be written back to any device
+--------------------------------------------------------------------------------
+*/
+#define ANDA 0x000000000000000B
+err2204_t anda2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
+
+/*
+----NOT the value at the 1st address. Store result in the 2nd-------------------
+    ASM Layout  ANDA <64bit address>, <64bit address>
+    Bin Layout  0x000000000000000C
+                0x????????????????
+                0x????????????????
+    Note        Both operands must be in the CPU registers
+                Can be written back to any device
+--------------------------------------------------------------------------------
+*/
+#define NOTA 0x000000000000000C
+err2204_t nota2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
+
+/*
+----NAND the value at the 1st address with the 2nd. Store result in 3rd---------
+    ASM Layout  NNDA <64bit address>, <64bit address>, <64bit address>
+    Bin Layout  0x000000000000000D
+                0x????????????????
+                0x????????????????
+                0x????????????????
+    Note        Both operands must be in the CPU registers
+                Can be written back to any device
+--------------------------------------------------------------------------------
+*/
+#define NNDA 0x000000000000000D
+err2204_t nanda2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
+
 #endif

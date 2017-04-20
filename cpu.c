@@ -171,6 +171,46 @@ err2204_t cpuRun(cpu_t *cpuDevice, ram_t *ramDevice)
                 }
                 break;
                 
+            case ORAD:
+                sprintf(debugString, "Instruction: ORAD");
+                debug(debugString, INFO);
+                error = orad2204(cpuDevice, ramDevice, debugString);
+                if (error.errnum != SUCCESS)
+                {
+                    return (error);
+                }
+                break;
+                
+            case ANDA:
+                sprintf(debugString, "Instruction: ANDA");
+                debug(debugString, INFO);
+                error = anda2204(cpuDevice, ramDevice, debugString);
+                if (error.errnum != SUCCESS)
+                {
+                    return (error);
+                }
+                break;
+                
+            case NOTA:
+                sprintf(debugString, "Instruction: NOTA");
+                debug(debugString, INFO);
+                error = nota2204(cpuDevice, ramDevice, debugString);
+                if (error.errnum != SUCCESS)
+                {
+                    return (error);
+                }
+                break;
+                
+            case NNDA:
+                sprintf(debugString, "Instruction: NNDA");
+                debug(debugString, INFO);
+                error = nanda2204(cpuDevice, ramDevice, debugString);
+                if (error.errnum != SUCCESS)
+                {
+                    return (error);
+                }
+                break;
+                
             default:
                 error.errnum = ERR_UNKNOWN_INSTRUCTION;
                 error.address = cpuDevice->PC;
