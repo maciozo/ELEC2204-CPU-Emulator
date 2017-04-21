@@ -321,7 +321,7 @@ err2204_t jumpgtn2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
 err2204_t jumpltn2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
 
 /*
-----Multiply the value at the 2nd address by the 1st. Store result in 3rd-------
+----Multiply the value at the 1st address by the 2nd. Store result in 3rd-------
     ASM Layout  MULA <64bit address>, <64bit address>, <64bit address>
     Bin Layout  0x0000000000000017
                 0x????????????????
@@ -335,7 +335,7 @@ err2204_t jumpltn2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
 err2204_t mula2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
 
 /*
-----Multiply the value at the 2nd address by the 1st. Store result in 3rd-------
+----Divide the value at the 1st address by the 2nd. Store result in 3rd---------
     ASM Layout  DIVA <64bit address>, <64bit address>, <64bit address>
     Bin Layout  0x0000000000000018
                 0x????????????????
