@@ -86,7 +86,7 @@ err2204_t jumpgtp2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString)
     sprintf(debugString, "Jump forward distance %" PRIu64, cpuDevice->arguments[2]);
     debug(debugString, INFO);
     
-    /* Check if the two operands are equal */
+    /* Check if the two operands fulfill the jump condition */
     if (cpuDevice->arguments[0] > cpuDevice->arguments[1])
     {
         sprintf(debugString, "Jumping. %" PRIx64 " > %" PRIx64, cpuDevice->arguments[0], cpuDevice->arguments[1]);
