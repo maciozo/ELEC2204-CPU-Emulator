@@ -146,6 +146,27 @@
             
         \subsubsection{MODA}
             This instruction divides the value of the first address by the value of the second address, and stores the remainder of the result in the third address. The process is identical to that of ADDA's.
+            
+        \subsubsection{NOTA}
+            This instruction carries out a bitwise NOT operation on the value of the first address, and stores the remainder of the result in the second address. The function gets the value of the first address, checks to make sure it's in the GP CPU registers, then writes the result of the NOT operation to the second address.
+            
+        \subsubsection{JUML}
+            This instruction sets the PC to the specified address.
+            
+        \subsubsection{JEQA}
+            This instruction checks if the values of the first and second addresses are equal. If so, the PC is set to the third address. Both operands must be located in the GP CPU registers.
+            
+        \subsubsection{JEQP}
+            This instruction checks if the values of the first and second addresses are equal. If so, the PC is incremented by the amount specified in the third argument. Both operands must be located in the GP CPU registers.
+            
+        \subsubsection{JGTP}
+            This instruction checks if the value of the first address is greater than that of then second address. If so, the PC is incremented by the amount specified in the third argument. Both operands must be located in the GP CPU registers.
+            
+        \subsubsection{JLGP}
+            This instruction checks if the value of the first address is less than that of then second address. If so, the PC is incremented by the amount specified in the third argument. Both operands must be located in the GP CPU registers.
+            
+        \subsubsection{JEQN, JGTN, JLTN}
+            These instructions are identical to their \lstinline{JxxP} counterparts, but they decrement the PC by the value of the third argument, as opposed to increment.
     
 \section{Testing}
 
