@@ -239,17 +239,34 @@ err2204_t jumpeqp2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
 ----If the value of the first address is greater than that of the second
                     address, jump the specified number of addresses forward-----
     ASM Layout  JGTP <64bit address>, <64bit address>, <64bit distance>
-    Bin Layout  0x0000000000000011
+    Bin Layout  0x0000000000000012
                 0x????????????????
                 0x????????????????
                 0x????????????????
     Note        Both operands must be in the CPU registers
                 Can jump to any device
-                Distance will be counted from the end of the last JEQP
+                Distance will be counted from the end of the last JGTP
                     instruction word
 --------------------------------------------------------------------------------
 */
 #define JGTP 0x0000000000000012
 err2204_t jumpgtp2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
+
+/*
+----If the value of the first address is less than that of the second
+                    address, jump the specified number of addresses forward-----
+    ASM Layout  JLTP <64bit address>, <64bit address>, <64bit distance>
+    Bin Layout  0x0000000000000013
+                0x????????????????
+                0x????????????????
+                0x????????????????
+    Note        Both operands must be in the CPU registers
+                Can jump to any device
+                Distance will be counted from the end of the last JLTP
+                    instruction word
+--------------------------------------------------------------------------------
+*/
+#define JLTP 0x0000000000000013
+err2204_t jumpltp2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
 
 #endif
