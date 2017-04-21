@@ -167,6 +167,9 @@
             
         \subsubsection{JEQN, JGTN, JLTN}
             These instructions are identical to their \lstinline{JxxP} counterparts, but they decrement the PC by the value of the third argument, as opposed to increment.
+            
+        \subsubsection{NOOP, STOP}
+            These functions do not have their own source files due to their simplicity. Both have their operation defined in the instruction decoding switch/case statement in \lstinline{cpu.c}. \lstinline{NOOP} increments the PC by one, and lets the CPU continue. \lstinline{STOP} causes the main CPU loop to return with an error code of \lstinline{SUCCESS}.
     
 \section{Testing}
 
