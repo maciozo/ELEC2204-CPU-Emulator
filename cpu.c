@@ -74,7 +74,7 @@ err2204_t cpuRun(cpu_t *cpuDevice, ram_t *ramDevice)
         debug(debugString, INFO);
 
         /* Decode instruction */
-        switch(cpuDevice->currentInstruction)
+        switch (cpuDevice->currentInstruction)
         {
             case NOOP:
                 sprintf(debugString, "Instruction: NOOP");

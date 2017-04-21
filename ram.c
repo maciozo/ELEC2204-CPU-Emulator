@@ -12,6 +12,8 @@ int ramInit(ram_t *ramDevice, uint8_t ramAddress, uint64_t ramSize)
 {
     uint64_t i;
     ramDevice->address = ramAddress;
+    
+    /* There must be at least 1 register, so the RAM can't start at address 1 */
     if (ramDevice->address < 2)
     {
         return(ERR_ADDRESS_OUT_OF_RANGE);
@@ -22,12 +24,16 @@ int ramInit(ram_t *ramDevice, uint8_t ramAddress, uint64_t ramSize)
     printf("Max RAM address: 0x%" PRIx64 "\n", ramDevice->addressMax);
     if (ramDevice->addressMax > 0xFFFFFFFFFFFFFFFF)
     {
+        /* It shouldn't be possible for this to ever happen */
         return(ERR_END_ADDRESS_OUT_OF_RANGE);
     }
     
+    /* Allocate memory for the RAM */
     ramDevice->ram = (uint64_t*) malloc(sizeof(uint64_t) * ramSize);
     ramDevice->states = (uint8_t*) malloc(sizeof(uint8_t) * ramSize);
     
+    /* Initialise all memory with the STOP instruction */
+    /* Mark all RAM locations as FREE */
     for (i = 0; i < ramSize; i++)
     {
         ramDevice->ram[i] = STOP;
