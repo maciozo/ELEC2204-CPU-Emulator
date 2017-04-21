@@ -301,6 +301,26 @@ err2204_t cpuRun(cpu_t *cpuDevice, ram_t *ramDevice)
                 }
                 break;
                 
+            case MULA:
+                sprintf(debugString, "Instruction: MULA");
+                debug(debugString, INFO);
+                error = mula2204(cpuDevice, ramDevice, debugString);
+                if (error.errnum != SUCCESS)
+                {
+                    return (error);
+                }
+                break;
+                
+            case DIVA:
+                sprintf(debugString, "Instruction: DIVA");
+                debug(debugString, INFO);
+                error = diva2204(cpuDevice, ramDevice, debugString);
+                if (error.errnum != SUCCESS)
+                {
+                    return (error);
+                }
+                break;
+                
             default:
                 error.errnum = ERR_UNKNOWN_INSTRUCTION;
                 error.address = cpuDevice->PC;

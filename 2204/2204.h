@@ -320,4 +320,32 @@ err2204_t jumpgtn2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
 #define JLTN 0x0000000000000016
 err2204_t jumpltn2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
 
+/*
+----Multiply the value at the 2nd address by the 1st. Store result in 3rd-------
+    ASM Layout  MULA <64bit address>, <64bit address>, <64bit address>
+    Bin Layout  0x0000000000000017
+                0x????????????????
+                0x????????????????
+                0x????????????????
+    Note        Both operands must be in the CPU registers
+                Can be written back to any device
+--------------------------------------------------------------------------------
+*/
+#define MULA 0x0000000000000017
+err2204_t mula2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
+
+/*
+----Multiply the value at the 2nd address by the 1st. Store result in 3rd-------
+    ASM Layout  DIVA <64bit address>, <64bit address>, <64bit address>
+    Bin Layout  0x0000000000000018
+                0x????????????????
+                0x????????????????
+                0x????????????????
+    Note        Both operands must be in the CPU registers
+                Can be written back to any device
+--------------------------------------------------------------------------------
+*/
+#define DIVA 0x0000000000000018
+err2204_t diva2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
+
 #endif

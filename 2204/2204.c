@@ -19,3 +19,5 @@
 #include "jumpeqn.c"
 #include "jumpgtn.c"
 #include "jumpltn.c"
+#include "mula.c"
+#include "diva.c"
