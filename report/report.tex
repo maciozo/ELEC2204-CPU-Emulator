@@ -26,6 +26,24 @@
 \usepackage{subfiles}
 \usepackage{listings}
 \usepackage{csvsimple}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{fancyvrb}
+
+% redefine \VerbatimInput
+\RecustomVerbatimCommand{\VerbatimInput}{VerbatimInput}%
+{fontsize=\footnotesize,
+ %
+ frame=lines,  % top and bottom rule only
+ framesep=2em, % separation between frame and text
+ rulecolor=\color{Gray},
+ %
+ label=\fbox{\color{Black}fizzbuzzoutput.txt},
+ labelposition=topline,
+ %
+ commandchars=\|\(\), % escape character and argument delimiters for
+                      % commands within the verbatim
+ commentchar=*        % comment character
+}
 
 \graphicspath{ {./images/} }
 
@@ -170,17 +188,29 @@
             
         \subsubsection{NOOP, STOP}
             These functions do not have their own source files due to their simplicity. Both have their operation defined in the instruction decoding switch/case statement in \lstinline{cpu.c}. \lstinline{NOOP} increments the PC by one, and lets the CPU continue. \lstinline{STOP} causes the main CPU loop to return with an error code of \lstinline{SUCCESS}.
+            
+    \subsection{Assembler}
+        An assembler, \lstinline{assembler.c}, was written in order to translate the assembly language as defined by \lstinline{./2204/2204.h} in to machine code readable by the CPU. It reads the input assembly file line by line, and depending on which instruction it decodes, it will call a function to extract the appropriate number of arguments. The translated instructions and data are written sequentially to a binary output file, which will be read by \lstinline{emulator.c} and executed by the CPU.
     
 \section{Testing}
+    The emulator was tested using two programmes, both of which are are included in \lstinline{./programs}.
+    
+    \subsection{Bootloader}
+        The first programme, \lstinline{bootloader.asm}, does an arbitrary test of some of the implemented instructions. Not all of the functions are tested, since the addition of the later implemented instructions was trivial - only some switch cases in \lstinline{cpu.h} and \lstinline{assembler.c} were duplicated and modified slightly to reflect the names of the new instructions, the instructions were added to \lstinline{./2204/2204.h}, and their relative functions included in \lstinline{./2204/2204.c}. The functions themselves are mostly identical, just with some operators and debug strings changed. The comments in the assembly file describe what the emulator should do.
+    
+    \subsection{FizzBuzz}
+        This programme, \lstinline{fizzbuzz.asm}, plays the simple game involving listing out all the numbers from 1 to 100, but replacing any that are divisible by 3 with "fizz", and any that are divisible by 5 with "buzz". Any numbers that are divisible by both should be replaced with "fizzbuzz". Since text printing has not been implemented, "fizz" is represented by the hexadecimal value \lstinline{0xf122}, and "buzz" is represented by \lstinline{0xba22}.
 
 \section{Conclusion}
+    
+
 \section{Evaluation}
 
 \begin{appendices}
     \label{appendix}
-    \section{Baseline data}
-    \label{dat:baseline}
-        something
+    \section{Output of the FizzBuzz test programme}
+    \label{dat:fizzbuzz}
+        \VerbatimInput{fizzbuzzoutput.txt}
 \end{appendices}
 
 \bibliographystyle{IEEEtran}
