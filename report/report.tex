@@ -112,7 +112,7 @@
             This instruction takes the literal value of the second argument, and stores it in the address specified in the first address. This instruction's operation is defined in \lstinline{./2204/stor.c}. Firstly, the destination address is read, and the respective device is determined. Then the data is read, and is then written to the specified memory address on the appropriate device.
             
         \subsubsection{PRNT, PRND}
-            This instructions get the data at the specified memory address, and then print the data to the terminal in hexadecimal or unsigned decimal form respectively. Both source files \lstinline{./2204/prnt.c} and \lstinline{./2204/prnd.c} are identical, apart from the differing \lstinline{sprintf()} format specifiers - \lstinline{PRIx64} for hexadecimal, \lstinline{PRIu64} for unsigned decimal. The hexadecimal version also puts \lstinline{"0x"} before the value.
+            These instructions get the data at the specified memory address, and then print the data to the terminal in hexadecimal or unsigned decimal form respectively. Both source files \lstinline{./2204/prnt.c} and \lstinline{./2204/prnd.c} are identical, apart from the differing \lstinline{sprintf()} format specifiers - \lstinline{PRIx64} for hexadecimal, \lstinline{PRIu64} for unsigned decimal. The hexadecimal version also puts \lstinline{"0x"} before the value.
             
         \subsubsection{FREE}
             This instruction takes a RAM address and a literal length. Starting at the given address, it marks a number equal to the specified length of consecutive RAM addresses starting at the specified address, as \lstinline{RAM_FREE}, marking it as available for writing.
