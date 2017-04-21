@@ -1,0 +1,166 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% EL/EEE D1 Report Template
+% University of Southampton
+%
+% author : Rhys Thomas (rt8g15)
+%
+% edited : 2016-11-14
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[a4paper,11pt]{article}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PACKAGES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[margin=1in]{geometry}
+\renewcommand{\baselinestretch}{1.2} % line spacing
+\usepackage{color}
+\usepackage{siunitx}
+\usepackage{graphicx}
+\usepackage{epstopdf}
+\usepackage{float}
+\usepackage{pdfpages}
+\usepackage{hyperref}
+\usepackage{mathtools}
+\usepackage[titletoc,toc,title]{appendix}
+\usepackage{subfiles}
+\usepackage{listings}
+\usepackage{csvsimple}
+
+\graphicspath{ {./images/} }
+
+\lstset{frame=tb,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3,
+  numbers=left
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% DOCUMENT BEGIN
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+  
+\begin{center}
+{\Large{\textbf{ELEC2204 -- Computer Emulation}}} \\ [\baselineskip]
+\subfile{info.tex}
+\end{center}
+
+\begin{abstract}
+
+\end{abstract}
+
+\section{Introduction}
+    The aim of this exercise was to implement the functionality of our own Von Neumann architecture in software. The architecture should feature a limited instruction set that follows a fetch/decode/execute/write-back cycle. The architecture was named "2204".
+
+\section{System Architecture}
+    The 2204 architecture, at its core, is a 64-bit instruction set, with its memory addresses split between three "devices", the general purpose (GP) CPU registers, the RAM, and the NULL device. Each memory address stores 64 bits of data. A 64-bit block of data will be referred to as a "word". All addresses within the 64-bit space can be used, with the exception of \lstinline{0x0} (the NULL device). This allows a maximum amount of addressed memory of:
+    
+    \begin{displaymath}
+        \left(2^{64} - 1\right) \frac{64}{8} \approx \SI{147.5}{EB}
+    \end{displaymath}
+    
+    The architecture allows for variable GP register and RAM sizes, though once the system is running, the sizes are fixed. The CPU contains 4 static registers for storing intermediate data - usually instruction arguments.
+    
+    Both the GP registers and the RAM are mandatory. Arithmetic and logical operations can only be carried out on data stored in the GP CPU registers. The bootloader program is loaded in to the RAM starting at the first address of the RAM.
+    
+    Data in the memory can only be transferred through the GP CPU registers. Data can not be copied directly from one RAM address to another. They must be copied to GP CPU registers first, then copied in to the RAM.
+    
+    Each CPU instruction can use a variable amount of memory, depending on the amount of operands it requires. Each operand takes up one word's worth of memory. Some examples are shown in table~\ref{dat:instructionSizes}.
+    
+    \begin{table}[h]
+    \centering
+        \csvautotabular{./tables/instructionSizes.csv}
+        \label{dat:instructionSizes}
+        \caption{Word sizes of some of the implemented instructions. The instruction itself takes up one word, as does each argument.}
+    \end{table}
+    
+    Only RAM addresses that are marked as \lstinline{RAM_FREE} can be written to. After writing to a RAM address, that address will be marked as \lstinline{RAM_USED}. To be able to overwrite a memory address, the \lstinline{FREE} instruction should be used.
+
+\section{Implementation}
+    The emulator for the 2204 instruction set was implemented in C. Each element of the emulator is in its own source file.
+    
+    \subsection{Main emulator code}
+        The code that containins the main function, initialises the emulator, loads the bootloader, and then runs the emulator, is located in \lstinline{emulator.c}. This file loads the options specified in \lstinline{default.cfg} using the \lstinline{libconfig-1.5} library~\cite{libconfig}. The loaded options are the path to the bootloader, the number of GP CPU registers, the first memory address of the RAM, and the number of RAM addresses. The RAM and CPU are then initialised using \lstinline{ramInit()} and \lstinline{cpuInit}. These functions are defined in \lstinline{ram.c} and \lstinline{cpu.c} respectively. Finally, the \lstinline{boot()} function is called, which starts the emulator.
+    
+    \subsection{RAM}
+        The code that handles the functions of the RAM is included in \lstinline{ram.c}. The initialisation function, \lstinline{ramInit()}, allocates the required amount of memory, and initialises it all to the \lstinline{STOP} instruction. This is to prevent the CPU from running away if it jumps to an unused address. Each RAM address is also marked as \lstinline{RAM_FREE}, to allow it to be written to. The \lstinline{ramRead()} and \lstinline{ramWrite()} functions are used to read and write data to the RAM respectively. Their \lstinline{ramReadBurst()} and \lstinline{ramWriteBurst()} counterparts allow a block of multiple words to be read or written, but no instructions have been written to make use of these functions. The \lstinline{ramFree()} function is used to mark RAM addresses as \lstinline{RAM_FREE}. This function is used by the \lstinline{FREE} instruction. The \lstinline{ramState} function is used to check whether a RAM address is free for writing, but no instructions that make use of this function have been implemented.
+    
+    \subsection{CPU}
+        The code that handles the functions of the CPU is included in \lstinline{cpu.h}. The initialisation function, \lstinline{cpuInit()}, initialises the programme counter (PC) to the first RAM address, where the bootloader was stored by \lstinline{emulator.c}. It also allocates the required amount of memory for the GP CPU registers. The main loop of the CPU is located in the \lstinline{cpuRun()} function. The loop first loads the instruction from whatever device the address in the programme counter points to, then enters a switch/case statement which carries out the specified instruction. If any of the instructions return an error, or the CPU receives an unknown instruction, the CPU loop returns, and the emulator stops. The \lstinline{checkResult()} function is mostly for debugging purposes. It prints out any error information if it receives an unsuccessful result from an operation. The \lstinline{memDirector()} function is used to determine which device a given memory address belongs to, so that checks for whether an instuction can be legally carried out can be made, as well as so that the CPU knows which method it should use to access/store data. The \lstinline{debug()} function is used to print debug messages depending on the level of verbosity defined in the \lstinline{CPU_DEBUG} macro in \lstinline{cpu.h}. The \lstinline{print_current_time_with_ms()} function~cite{printCurrentTime} is used for getting the current time for printing in the \lstinline{debug()} function. The \lstinline{getArg()} function is used for reading data from the correct device.
+    
+    \subsection{Errors}
+        All the errors that the emulator is programmed to throw are defined in \lstinline{errors.h} along with their more human-readable text strings, which are printed by the \lstinline{printError()} function in \lstinline{errors.c}. When an error is printed, the memory address at which the error occured is also given, which is useful for debugging.
+    
+    \subsection{Instructions}
+        All the implemented instructions are defined in \lstinline{./2204/2204.h}. This header file also contains human readable comments on the structure of each instruction, and how they should be implemented in the assembly language. The operation of every instrution, with the exception of \lstinline{NOOP} and \lstinline{STOP}, is defined in its own source file in the \lstinline{./2204} directory. Some of the names of the source files differ from their mnemonics. In these cases, \lstinline{./2204/2204.h} can be referred to again for the appropriate function name. For example, the function that carries out the \lstinline{JGTP} (Jump Greater Than Positively), is called \lstinline{jumpgtp2204()}. In this case, the appropriate source file will be \lstinline{jumpgtp.c}. Every instruction source file is included in \lstinline{./2204/2204.c}. This is so that the compilation command line does not have to contain the path to every single instruction's source file, just the path to \lstinline{./2204/2204.c}.
+    
+        \subsubsection{COPY}
+            This instruction was implemented before the \lstinline{getArg()} function, so it does not make use of it for reading the source or destination addresses. Its operation is defined in \lstinline{./2204/copy.c}. The PC is incremented to point to the first argument, which is the source address. The address is read, and then the operation is repeated to read the destination address. The addresses are then checked to make sure that the data are being copied to or from the the GP CPU registers. If so, the data from the source address is copied to the destination address according to their respective devices.
+            
+        \subsubsection{STOR}
+            This instruction takes the literal value of the second argument, and stores it in the address specified in the first address. This instruction's operation is defined in \lstinline{./2204/stor.c}. Firstly, the destination address is read, and the respective device is determined. Then the data is read, and is then written to the specified memory address on the appropriate device.
+            
+        \subsubsection{PRNT, PRND}
+            This instructions get the data at the specified memory address, and then print the data to the terminal in hexadecimal or unsigned decimal form respectively. Both source files \lstinline{./2204/prnt.c} and \lstinline{./2204/prnd.c} are identical, apart from the differing \lstinline{sprintf()} format specifiers - \lstinline{PRIx64} for hexadecimal, \lstinline{PRIu64} for unsigned decimal. The hexadecimal version also puts \lstinline{"0x"} before the value.
+            
+        \subsubsection{FREE}
+            This instruction takes a RAM address and a literal length. Starting at the given address, it marks a number equal to the specified length of consecutive RAM addresses starting at the specified address, as \lstinline{RAM_FREE}, marking it as available for writing.
+            
+        \subsubsection{ADDA}
+            This instruction adds the values at the first and second specified addresses, and stores the result in the third specified address. Both of the first two addresses must reside in the GP CPU registers. The function gets the first address, checks to make sure it's in the GP CPU registers, and gets the first operand and stores it in the CPU's first static register. It then does the same for the second address, gets the address to write back to, then writes the result to the address.
+            
+        \subsubsection{MULA}
+            This instruction multiplies the values at the first and second specified addresses, and stores the result in the third specified address. The process is identical to that of ADDA's.
+            
+        \subsubsection{ORAD}
+            This instruction carries out a bitwise OR on the values at the first and second specified addresses, and stores the result in the third specified address. The process is identical to that of ADDA's.
+            
+        \subsubsection{ANDA}
+            This instruction carries out a bitwise AND on the values at the first and second specified addresses, and stores the result in the third specified address. The process is identical to that of ADDA's.
+            
+        \subsubsection{NNDA}
+            This instruction carries out a bitwise NAND on the values at the first and second specified addresses, and stores the result in the third specified address. The process is identical to that of ADDA's.
+            
+        \subsubsection{NORA}
+            This instruction carries out a bitwise NOR on the values at the first and second specified addresses, and stores the result in the third specified address. The process is identical to that of ADDA's.
+            
+        \subsubsection{XORA}
+            This instruction carries out a bitwise XOR on the values at the first and second specified addresses, and stores the result in the third specified address. The process is identical to that of ADDA's.
+            
+        \subsubsection{SUBA}
+            This instruction subtracts the value of the second address from the value of the first address, and stores the result in the third address. The process is identical to that of ADDA's.
+            
+        \subsubsection{DIVA}
+            This instruction divides the value of the first address by the value of the second address, and stores the result in the third address. The process is identical to that of ADDA's.
+            
+        \subsubsection{MODA}
+            This instruction divides the value of the first address by the value of the second address, and stores the remainder of the result in the third address. The process is identical to that of ADDA's.
+    
+\section{Testing}
+
+\section{Conclusion}
+\section{Evaluation}
+
+\begin{appendices}
+    \label{appendix}
+    \section{Baseline data}
+    \label{dat:baseline}
+        something
+\end{appendices}
+
+\bibliographystyle{IEEEtran}
+% IEEEabrv abbreviates journal titles in accordance to IEEE standards 
+\bibliography{mybib}
+
+\end{document}
