@@ -235,4 +235,21 @@ err2204_t jumpeq2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
 #define JEQP 0x0000000000000011
 err2204_t jumpeqp2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
 
+/*
+----If the value of the first address is greater than that of the second
+                    address, jump the specified number of addresses forward-----
+    ASM Layout  JGTP <64bit address>, <64bit address>, <64bit distance>
+    Bin Layout  0x0000000000000011
+                0x????????????????
+                0x????????????????
+                0x????????????????
+    Note        Both operands must be in the CPU registers
+                Can jump to any device
+                Distance will be counted from the end of the last JEQP
+                    instruction word
+--------------------------------------------------------------------------------
+*/
+#define JGTP 0x0000000000000012
+err2204_t jumpgtp2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
+
 #endif

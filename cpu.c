@@ -251,6 +251,16 @@ err2204_t cpuRun(cpu_t *cpuDevice, ram_t *ramDevice)
                 }
                 break;
                 
+            case JGTP:
+                sprintf(debugString, "Instruction: JGTP");
+                debug(debugString, INFO);
+                error = jumpgtp2204(cpuDevice, ramDevice, debugString);
+                if (error.errnum != SUCCESS)
+                {
+                    return (error);
+                }
+                break;
+                
             default:
                 error.errnum = ERR_UNKNOWN_INSTRUCTION;
                 error.address = cpuDevice->PC;

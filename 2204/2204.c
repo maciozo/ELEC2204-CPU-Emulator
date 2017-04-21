@@ -14,3 +14,4 @@
 #include "xora.c"
 #include "jumpeq.c"
 #include "jumpeqp.c"
+#include "jumpgtp.c"
