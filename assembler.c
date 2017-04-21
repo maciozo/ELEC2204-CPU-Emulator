@@ -249,7 +249,7 @@ int assemble(char *inputLine, FILE *outputFile, uint64_t lineNumber)
     
     else if (!strcmp(instruction, "JEQN"))
     {
-        word = JEQP;
+        word = JEQN;
         printf("%s -> 0x%" PRIx64 "\n", instruction, word);
         fwrite(&word, sizeof(uint64_t), 1, outputFile);
         return (threeArgs(inputLine, outputFile));
@@ -257,7 +257,7 @@ int assemble(char *inputLine, FILE *outputFile, uint64_t lineNumber)
     
     else if (!strcmp(instruction, "JGTN"))
     {
-        word = JGTP;
+        word = JGTN;
         printf("%s -> 0x%" PRIx64 "\n", instruction, word);
         fwrite(&word, sizeof(uint64_t), 1, outputFile);
         return (threeArgs(inputLine, outputFile));
@@ -265,7 +265,7 @@ int assemble(char *inputLine, FILE *outputFile, uint64_t lineNumber)
     
     else if (!strcmp(instruction, "JLTN"))
     {
-        word = JLTP;
+        word = JLTN;
         printf("%s -> 0x%" PRIx64 "\n", instruction, word);
         fwrite(&word, sizeof(uint64_t), 1, outputFile);
         return (threeArgs(inputLine, outputFile));
