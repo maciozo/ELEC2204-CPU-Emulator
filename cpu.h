@@ -12,7 +12,7 @@
 #define WARNING 1
 #define INFO 2
 
-#define CPU_DEBUG INFO
+#define CPU_DEBUG ERROR
 
 /* Memory destination devices */
 #define DEV_INVALID -1
