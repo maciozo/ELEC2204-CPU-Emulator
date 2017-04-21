@@ -321,6 +321,16 @@ err2204_t cpuRun(cpu_t *cpuDevice, ram_t *ramDevice)
                 }
                 break;
                 
+            case MODA:
+                sprintf(debugString, "Instruction: MODA");
+                debug(debugString, INFO);
+                error = moda2204(cpuDevice, ramDevice, debugString);
+                if (error.errnum != SUCCESS)
+                {
+                    return (error);
+                }
+                break;
+                
             default:
                 error.errnum = ERR_UNKNOWN_INSTRUCTION;
                 error.address = cpuDevice->PC;

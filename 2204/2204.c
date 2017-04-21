@@ -21,3 +21,4 @@
 #include "jumpltn.c"
 #include "mula.c"
 #include "diva.c"
+#include "moda.c"

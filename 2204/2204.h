@@ -348,4 +348,18 @@ err2204_t mula2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
 #define DIVA 0x0000000000000018
 err2204_t diva2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
 
+/*
+----Divide the value at the 1st address by the 2nd. Store remainder in 3rd------
+    ASM Layout  MODA <64bit address>, <64bit address>, <64bit address>
+    Bin Layout  0x0000000000000019
+                0x????????????????
+                0x????????????????
+                0x????????????????
+    Note        Both operands must be in the CPU registers
+                Can be written back to any device
+--------------------------------------------------------------------------------
+*/
+#define MODA 0x0000000000000019
+err2204_t moda2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
+
 #endif
