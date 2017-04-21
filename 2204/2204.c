@@ -16,3 +16,6 @@
 #include "jumpeqp.c"
 #include "jumpgtp.c"
 #include "jumpltp.c"
+#include "jumpeqn.c"
+#include "jumpgtn.c"
+#include "jumpltn.c"

@@ -247,6 +247,30 @@ int assemble(char *inputLine, FILE *outputFile, uint64_t lineNumber)
         return (threeArgs(inputLine, outputFile));
     }
     
+    else if (!strcmp(instruction, "JEQN"))
+    {
+        word = JEQP;
+        printf("%s -> 0x%" PRIx64 "\n", instruction, word);
+        fwrite(&word, sizeof(uint64_t), 1, outputFile);
+        return (threeArgs(inputLine, outputFile));
+    }
+    
+    else if (!strcmp(instruction, "JGTN"))
+    {
+        word = JGTP;
+        printf("%s -> 0x%" PRIx64 "\n", instruction, word);
+        fwrite(&word, sizeof(uint64_t), 1, outputFile);
+        return (threeArgs(inputLine, outputFile));
+    }
+    
+    else if (!strcmp(instruction, "JLTN"))
+    {
+        word = JLTP;
+        printf("%s -> 0x%" PRIx64 "\n", instruction, word);
+        fwrite(&word, sizeof(uint64_t), 1, outputFile);
+        return (threeArgs(inputLine, outputFile));
+    }
+    
     else
     {
         return (ERR_UNKNOWN_INSTRUCTION);

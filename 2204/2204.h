@@ -269,4 +269,55 @@ err2204_t jumpgtp2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
 #define JLTP 0x0000000000000013
 err2204_t jumpltp2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
 
+/*
+----If the values of the first two addresses are equal, jump the specified 
+                                                number of addresses backward----
+    ASM Layout  JEQN <64bit address>, <64bit address>, <64bit distance>
+    Bin Layout  0x0000000000000014
+                0x????????????????
+                0x????????????????
+                0x????????????????
+    Note        Both operands must be in the CPU registers
+                Can jump to any device
+                Distance will be counted from the end of the last JEQN
+                    instruction word
+--------------------------------------------------------------------------------
+*/
+#define JEQN 0x0000000000000014
+err2204_t jumpeqn2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
+
+/*
+----If the value of the first address is greater than that of the second
+                    address, jump the specified number of addresses backward----
+    ASM Layout  JGTN <64bit address>, <64bit address>, <64bit distance>
+    Bin Layout  0x0000000000000015
+                0x????????????????
+                0x????????????????
+                0x????????????????
+    Note        Both operands must be in the CPU registers
+                Can jump to any device
+                Distance will be counted from the end of the last JGTN
+                    instruction word
+--------------------------------------------------------------------------------
+*/
+#define JGTN 0x0000000000000015
+err2204_t jumpgtn2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
+
+/*
+----If the value of the first address is less than that of the second
+                    address, jump the specified number of addresses backward----
+    ASM Layout  JLTN <64bit address>, <64bit address>, <64bit distance>
+    Bin Layout  0x0000000000000016
+                0x????????????????
+                0x????????????????
+                0x????????????????
+    Note        Both operands must be in the CPU registers
+                Can jump to any device
+                Distance will be counted from the end of the last JLTN
+                    instruction word
+--------------------------------------------------------------------------------
+*/
+#define JLTN 0x0000000000000016
+err2204_t jumpltn2204(cpu_t *cpuDevice, ram_t *ramDevice, char *debugString);
+
 #endif
