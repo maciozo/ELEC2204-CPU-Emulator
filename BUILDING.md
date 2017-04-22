@@ -1,14 +1,14 @@
 Building
 ===============
 
-##Emulator
+## Emulator
 
-###Dependancies
+### Dependancies
 
-* libconfig-1.5 (1.6 will probably work)
+* libconfig-1.5
 
 `make emulator`
 
-##Assembler
+## Assembler
 
 `make assembler`
