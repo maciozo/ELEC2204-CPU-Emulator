@@ -75,8 +75,11 @@
 \end{center}
 
 \begin{abstract}
-
+    An emulator for a custom made Von Neumann computer architecture was implemented in software. The architecture, named "2204", is a 64-bit architecture that allows memory addressing of the entire 64-bit space, except for address zero. The size of the general purpose registers and the RAM can be configured in a file before runtime. The CPU also contains 4 registers that are used for storing instruction arguments.
 \end{abstract}
+
+\tableofcontents
+\newpage
 
 \section{Introduction}
     The aim of this exercise was to implement the functionality of our own Von Neumann architecture in software. The architecture should feature a limited instruction set that follows a fetch/decode/execute/write-back cycle. The architecture was named "2204".
@@ -115,7 +118,7 @@
         The code that handles the functions of the RAM is included in \lstinline{ram.c}. The initialisation function, \lstinline{ramInit()}, allocates the required amount of memory, and initialises it all to the \lstinline{STOP} instruction. This is to prevent the CPU from running away if it jumps to an unused address. Each RAM address is also marked as \lstinline{RAM_FREE}, to allow it to be written to. The \lstinline{ramRead()} and \lstinline{ramWrite()} functions are used to read and write data to the RAM respectively. Their \lstinline{ramReadBurst()} and \lstinline{ramWriteBurst()} counterparts allow a block of multiple words to be read or written, but no instructions have been written to make use of these functions. The \lstinline{ramFree()} function is used to mark RAM addresses as \lstinline{RAM_FREE}. This function is used by the \lstinline{FREE} instruction. The \lstinline{ramState} function is used to check whether a RAM address is free for writing, but no instructions that make use of this function have been implemented.
     
     \subsection{CPU}
-        The code that handles the functions of the CPU is included in \lstinline{cpu.h}. The initialisation function, \lstinline{cpuInit()}, initialises the programme counter (PC) to the first RAM address, where the bootloader was stored by \lstinline{emulator.c}. It also allocates the required amount of memory for the GP CPU registers. The main loop of the CPU is located in the \lstinline{cpuRun()} function. The loop first loads the instruction from whatever device the address in the programme counter points to, then enters a switch/case statement which carries out the specified instruction. If any of the instructions return an error, or the CPU receives an unknown instruction, the CPU loop returns, and the emulator stops. The \lstinline{checkResult()} function is mostly for debugging purposes. It prints out any error information if it receives an unsuccessful result from an operation. The \lstinline{memDirector()} function is used to determine which device a given memory address belongs to, so that checks for whether an instuction can be legally carried out can be made, as well as so that the CPU knows which method it should use to access/store data. The \lstinline{debug()} function is used to print debug messages depending on the level of verbosity defined in the \lstinline{CPU_DEBUG} macro in \lstinline{cpu.h}. The \lstinline{print_current_time_with_ms()} function~cite{printCurrentTime} is used for getting the current time for printing in the \lstinline{debug()} function. The \lstinline{getArg()} function is used for reading data from the correct device.
+        The code that handles the functions of the CPU is included in \lstinline{cpu.h}. The initialisation function, \lstinline{cpuInit()}, initialises the programme counter (PC) to the first RAM address, where the bootloader was stored by \lstinline{emulator.c}. It also allocates the required amount of memory for the GP CPU registers. The main loop of the CPU is located in the \lstinline{cpuRun()} function. The loop first loads the instruction from whatever device the address in the programme counter points to, then enters a switch/case statement which carries out the specified instruction. If any of the instructions return an error, or the CPU receives an unknown instruction, the CPU loop returns, and the emulator stops. The \lstinline{checkResult()} function is mostly for debugging purposes. It prints out any error information if it receives an unsuccessful result from an operation. The \lstinline{memDirector()} function is used to determine which device a given memory address belongs to, so that checks for whether an instuction can be legally carried out can be made, as well as so that the CPU knows which method it should use to access/store data. The \lstinline{debug()} function is used to print debug messages depending on the level of verbosity defined in the \lstinline{CPU_DEBUG} macro in \lstinline{cpu.h}. The \lstinline{print_current_time_with_ms()} function~\cite{printCurrentTime} is used for getting the current time for printing in the \lstinline{debug()} function. The \lstinline{getArg()} function is used for reading data from the correct device.
     
     \subsection{Errors}
         All the errors that the emulator is programmed to throw are defined in \lstinline{errors.h} along with their more human-readable text strings, which are printed by the \lstinline{printError()} function in \lstinline{errors.c}. When an error is printed, the memory address at which the error occured is also given, which is useful for debugging.
@@ -202,9 +205,18 @@
         This programme, \lstinline{fizzbuzz.asm}, plays the simple game involving listing out all the numbers from 1 to 100, but replacing any that are divisible by 3 with "fizz", and any that are divisible by 5 with "buzz". Any numbers that are divisible by both should be replaced with "fizzbuzz". Since text printing has not been implemented, "fizz" is represented by the hexadecimal value \lstinline{0xf122}, and "buzz" is represented by \lstinline{0xba22}.
 
 \section{Conclusion}
-    
+    An emulator for a custom instruction set, known as the "2204" instruction set, was successfully written in C, as well as an assembler too allow programming in an assembly language. The emulator is capable of having its general purpose CPU register count, RAM starting address, as well as the size of the RAM modified before runtime through the use of a configuration file. The emulator is capable of running external programmes that are in the 2204 binary format, such as those generated by the supplied assembler.
 
 \section{Evaluation}
+    Given the weight of this task, the produced solution may be considered to be rather over-engineered. Though the relatively high complexity means that the instruction set is quite easy to extend.
+    
+    Some parts of the code could have definitely been simplified, such as the instruction decoding stage in \lstinline{cpu.c}. Clever use of macros could have prevented the need for many almost identical blocks of code. This is similarly true for the instruction set functions - many of them are largely identical, just with a few strings or operators changed. The current codebase is unnecessarily large.
+    
+    The assembler itself has quite a few bugs. Instruction lines with comments at the end of them that are too long, will cause a segmentation fault, mainly due to the lazy argument detection. A lot of the code itself is also repeated, and could be condensed to a few simpler functions.
+    
+    The instruction set follows the required fetch/decode/execute/write-back cycle, with the exception of certain instructions that do not require a write-back stage.
+    
+\newpage
 
 \begin{appendices}
     \label{appendix}
@@ -212,6 +224,7 @@
     \label{dat:fizzbuzz}
         \VerbatimInput{fizzbuzzoutput.txt}
 \end{appendices}
+\newpage
 
 \bibliographystyle{IEEEtran}
 % IEEEabrv abbreviates journal titles in accordance to IEEE standards 
