@@ -7,6 +7,7 @@
 ### Emulator
 #### Configuration
 In `default.cfg`
+
 | Variable      | Type    | Description                                               | 
 |---------------|---------|-----------------------------------------------------------| 
 | bootLoader    | String  | The path to the programme binary for the emulator to load | 
